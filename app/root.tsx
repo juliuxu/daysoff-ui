@@ -20,7 +20,7 @@ export default function App() {
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <link
           rel="stylesheet"
-          href="https://unpkg.com/@picocss/pico@latest/css/pico.classless.min.css"
+          href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css"
         />
         <Meta />
         <Links />
