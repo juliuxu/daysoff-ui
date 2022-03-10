@@ -37,6 +37,10 @@ const login = async () => {
 export const fetchCabinsSimple = async (
   category: Category
 ): Promise<CabinSimple[]> => {
+  const cacheKey = `cabinsSimple-${category}`;
+  if (cache.has(cacheKey)) {
+    return cache.get(cacheKey) as CabinSimple[];
+  }
   const response = await client.get(
     `https://firmahytte.daysoff.no/resultater?cat=${category}`
   );
@@ -48,12 +52,18 @@ export const fetchCabinsSimple = async (
     image: $(e).find("img").first().attr("src")!,
   }));
 
+  cache.set(cacheKey, cabins);
   return cabins;
 };
 
 export const fetchCabinDetailed = async (
   cabinSimple: CabinSimple
 ): Promise<CabinDetailed> => {
+  const cacheKey = `cabinDetailed-${cabinSimple.link}`;
+  if (cache.has(cacheKey)) {
+    return cache.get(cacheKey) as CabinDetailed;
+  }
+
   const response = await client.get(
     `https://firmahytte.daysoff.no${cabinSimple.link}`
   );
@@ -65,7 +75,7 @@ export const fetchCabinDetailed = async (
   const lat = locationMatch[1];
   const lng = locationMatch[2];
 
-  return {
+  const cabinDetailed = {
     link: cabinSimple.link,
     title: $("h1").text(),
     images: $(".image_lightbox--images--item")
@@ -97,6 +107,9 @@ export const fetchCabinDetailed = async (
       .get()
       .map((e) => $(e).find("h3").text().trim()),
   };
+
+  cache.set(cacheKey, cabinDetailed);
+  return cabinDetailed;
 };
 
 // Helper

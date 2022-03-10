@@ -1,16 +1,11 @@
 import { json, LoaderFunction, useLoaderData } from "remix";
-import LRU from "lru-cache";
 import { fetchAllCabins } from "~/daysoffClient";
 import { CabinDetailed, Category } from "~/domain";
 import DebugData from "~/components/DebugData";
 
-const cache = new LRU({ max: 500 });
 export const loader: LoaderFunction = async () => {
-  if (!cache.has("mountainCabins")) {
-    const mountainCabins = await fetchAllCabins(Category.Mountain);
-    cache.set("mountainCabins", mountainCabins);
-  }
-  return json(cache.get("mountainCabins"));
+  const mountainCabins = await fetchAllCabins(Category.Mountain);
+  return json(mountainCabins);
 };
 
 export default function Index() {
