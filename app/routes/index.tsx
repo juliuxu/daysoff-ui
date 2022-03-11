@@ -4,10 +4,11 @@ import {
   allowsDogs,
   CabinDetailed,
   Category,
-  computedCabin,
+  preparedCabin,
   hasSauna,
 } from "~/domain";
 import DebugData from "~/components/DebugData";
+import React from "react";
 
 export const loader: LoaderFunction = async () => {
   let mountainCabins: CabinDetailed[];
@@ -25,11 +26,25 @@ export default function Index() {
       </header>
       <main className="container">
         <section>
-          Filter
-          <fieldset>
+          <fieldset onChange={(e) => console.log({ e: e.target })}>
+            <legend>
+              <strong>Filtrer hytter</strong>
+            </legend>
             <label>
-              <input type="checkbox" name="allowDogs" />
-              Allows dogs 🐶
+              <input role="switch" type="checkbox" name="allowDogs" />
+              Hunder 🐶
+            </label>
+            <label>
+              <input role="switch" type="checkbox" name="hasInternet" />
+              Internett 🌐
+            </label>
+            <label>
+              <input role="switch" type="checkbox" name="hasSauna" />
+              Badstue 🧖
+            </label>
+            <label>
+              <input role="switch" type="checkbox" name="hasHottub" />
+              Boblebad ♨️
             </label>
           </fieldset>
         </section>
@@ -49,27 +64,76 @@ export default function Index() {
 interface CabinsTableProps {
   cabins: CabinDetailed[];
 }
-const CabinTable = ({ cabins }: CabinsTableProps) => {
+const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
+  interface SortState {
+    name: string;
+    dir: "🔼" | "🔽" | "";
+  }
+  const [sortState, setSortState] = React.useState<SortState>({
+    name: "Lokasjon",
+    dir: "",
+  });
+  const toggleSortState = (name: string) =>
+    setSortState((current) => {
+      if (name !== current.name) return { name, dir: "🔼" };
+      else if (current.dir === "") return { name, dir: "🔼" };
+      else if (current.dir === "🔼") return { name, dir: "🔽" };
+      else return { name, dir: "🔼" };
+    });
+
+  const cabins = cabinsRaw.map(preparedCabin);
+  if (sortState.dir !== "") {
+    const x = (cabin: any) => {
+      if (sortState.name === "Lokasjon") return cabin.locationName;
+      if (sortState.name === "Soverom") return cabin.bedrooms;
+      if (sortState.name === "Hunder") return cabin.allowsDogs;
+      if (sortState.name === "Internett") return cabin.hasInternet;
+      if (sortState.name === "Badstue") return cabin.hasSauna;
+      if (sortState.name === "Boblebad") return cabin.hasHottub;
+      throw new Error(`unhandled sort ${sortState.name}`);
+    };
+    cabins.sort((a, b) => {
+      if (x(a) < x(b)) {
+        return sortState.dir === "🔼" ? -1 : 1;
+      }
+      if (x(a) > x(b)) {
+        return sortState.dir === "🔼" ? 1 : -1;
+      }
+      return 0;
+    });
+  }
+
+  const Th = (name: string) => (
+    <th scope="col" onClick={() => toggleSortState(name)}>
+      {name} {name === sortState.name && sortState.dir}
+    </th>
+  );
   return (
     <figure>
       <table>
         <thead>
           <tr>
-            <th scope="col">Lokasjon</th>
-            <th scope="col">Hunder</th>
-            <th scope="col">Internett</th>
-            <th scope="col">Badstue</th>
+            {Th("Lokasjon")}
+            {Th("Soverom")}
+            {Th("Hunder")}
+            {Th("Internett")}
+            {Th("Badstue")}
+            {Th("Boblebad")}
           </tr>
         </thead>
         <tbody>
-          {cabins.map(computedCabin).map((cabin) => (
+          {cabins.map((cabin) => (
             <tr key={cabin.link}>
-              <td>{cabin.locationName}</td>
-              <td>{cabin.allowsDogs ? "🐶" : "🚫"}</td>
-              <td>{cabin.hasInternet ? "🌐" : "🚫"}</td>
-              <td>{cabin.hasSauna ? "🧖" : "🚫"}</td>
-              <td>Cell</td>
-              <td>Cell</td>
+              <td>
+                <a href={`${DAYSOFF_BASEURL}${cabin.link}`} target="_blank">
+                  {cabin.locationName} ↗
+                </a>
+              </td>
+              <td>{cabin.bedrooms}</td>
+              <td>{cabin.allowsDogs ? "🐶" : "-"}</td>
+              <td>{cabin.hasInternet ? "🌐" : "-"}</td>
+              <td>{cabin.hasSauna ? "🧖" : "-"}</td>
+              <td>{cabin.hasHottub ? "♨️" : "-"}</td>
             </tr>
           ))}
         </tbody>

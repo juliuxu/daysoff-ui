@@ -29,7 +29,7 @@ export const allowsDogs = (cabin: CabinDetailed) =>
 export const hasSauna = (cabin: CabinDetailed) =>
   cabin.facilities.includes("Badstue");
 
-export const computedCabin = (cabin: CabinDetailed) => ({
+export const preparedCabin = (cabin: CabinDetailed) => ({
   ...cabin,
 
   get locationName() {
@@ -43,5 +43,11 @@ export const computedCabin = (cabin: CabinDetailed) => ({
   },
   get hasSauna() {
     return hasSauna(cabin);
+  },
+  get hasHottub() {
+    return cabin.facilities.includes("Boblebad");
+  },
+  get bedrooms() {
+    return Number(cabin.specifications.Soverom);
   },
 });
