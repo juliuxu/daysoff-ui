@@ -20,3 +20,28 @@ export interface CabinDetailed {
   location: { lat: string; lng: string };
   closeby: string[];
 }
+
+// Domain functions
+export const allowsDogs = (cabin: CabinDetailed) =>
+  cabin.rules.Husregler?.includes("Tillat med husdyr") &&
+  !cabin.rules.Husregler?.includes("Ikke tillat med husdyr");
+
+export const hasSauna = (cabin: CabinDetailed) =>
+  cabin.facilities.includes("Badstue");
+
+export const computedCabin = (cabin: CabinDetailed) => ({
+  ...cabin,
+
+  get locationName() {
+    return cabin.specifications.Beliggenhet;
+  },
+  get allowsDogs() {
+    return allowsDogs(cabin);
+  },
+  get hasInternet() {
+    return cabin.facilities.includes("Internett");
+  },
+  get hasSauna() {
+    return hasSauna(cabin);
+  },
+});

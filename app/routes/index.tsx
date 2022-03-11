@@ -1,6 +1,12 @@
 import { json, LoaderFunction, useLoaderData } from "remix";
 import { fetchCabinsForCategory, login } from "~/daysoffClient";
-import { CabinDetailed, Category } from "~/domain";
+import {
+  allowsDogs,
+  CabinDetailed,
+  Category,
+  computedCabin,
+  hasSauna,
+} from "~/domain";
 import DebugData from "~/components/DebugData";
 
 export const loader: LoaderFunction = async () => {
@@ -15,7 +21,7 @@ export default function Index() {
   return (
     <>
       <header className="container">
-        <h1>Daysoff, but better</h1>
+        <h1>Bedre daysoff visning</h1>
       </header>
       <main className="container">
         <section>
@@ -30,6 +36,7 @@ export default function Index() {
         Count: {cabins.length}
         <br />
         Count allow dogs: {cabins.filter((cabin) => allowsDogs(cabin)).length}
+        <CabinTable cabins={cabins} />
         {cabins.map((cabin) => (
           <Card key={cabin.link} cabin={cabin} />
         ))}
@@ -39,12 +46,37 @@ export default function Index() {
   );
 }
 
-// predicates
-const allowsDogs = (cabin: CabinDetailed) =>
-  cabin.rules.Husregler?.includes("Tillat med husdyr") &&
-  !cabin.rules.Husregler?.includes("Ikke tillat med husdyr");
-
-const hasSauna = (cabin: CabinDetailed) => cabin.facilities.includes("Badstue");
+interface CabinsTableProps {
+  cabins: CabinDetailed[];
+}
+const CabinTable = ({ cabins }: CabinsTableProps) => {
+  return (
+    <figure>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Lokasjon</th>
+            <th scope="col">Hunder</th>
+            <th scope="col">Internett</th>
+            <th scope="col">Badstue</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cabins.map(computedCabin).map((cabin) => (
+            <tr key={cabin.link}>
+              <td>{cabin.locationName}</td>
+              <td>{cabin.allowsDogs ? "🐶" : "🚫"}</td>
+              <td>{cabin.hasInternet ? "🌐" : "🚫"}</td>
+              <td>{cabin.hasSauna ? "🧖" : "🚫"}</td>
+              <td>Cell</td>
+              <td>Cell</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </figure>
+  );
+};
 
 interface CabinCardProps {
   cabin: CabinDetailed;
