@@ -1,10 +1,11 @@
 import { json, LoaderFunction, useLoaderData } from "remix";
-import { fetchAllCabins } from "~/daysoffClient";
+import { fetchCabinsForCategory, login } from "~/daysoffClient";
 import { CabinDetailed, Category } from "~/domain";
 import DebugData from "~/components/DebugData";
 
 export const loader: LoaderFunction = async () => {
-  const mountainCabins = await fetchAllCabins(Category.Mountain);
+  let mountainCabins: CabinDetailed[];
+  mountainCabins = await fetchCabinsForCategory(Category.Mountain);
   return json(mountainCabins);
 };
 
@@ -27,8 +28,10 @@ export default function Index() {
           </fieldset>
         </section>
         Count: {cabins.length}
+        <br />
+        Count allow dogs: {cabins.filter((cabin) => allowsDogs(cabin)).length}
         {cabins.map((cabin) => (
-          <Card cabin={cabin} />
+          <Card key={cabin.link} cabin={cabin} />
         ))}
         <DebugData data={cabins} />
       </main>

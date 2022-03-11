@@ -2,10 +2,12 @@ import axios from "axios";
 import { wrapper } from "axios-cookiejar-support";
 import { CookieJar } from "tough-cookie";
 import { load } from "cheerio";
-import LRU from "lru-cache";
+import Redis from "ioredis";
 import { CabinDetailed, CabinSimple, Category } from "./domain";
 
-const cache = new LRU({ max: 500 });
+const redisClient = new Redis(process.env.REDIS_URL);
+
+const cache = redisClient;
 const jar = new CookieJar();
 const client = wrapper(axios.create({ jar }));
 
@@ -19,7 +21,7 @@ const fetchToken = async () => {
   const html = await client.get("https://firmahytte.daysoff.no/");
   return parseToken(html.data);
 };
-const login = async () => {
+export const login = async () => {
   const token = await fetchToken();
   const response = await client.post(
     "https://firmahytte.daysoff.no/check",
@@ -38,21 +40,26 @@ export const fetchCabinsSimple = async (
   category: Category
 ): Promise<CabinSimple[]> => {
   const cacheKey = `cabinsSimple-${category}`;
-  if (cache.has(cacheKey)) {
-    return cache.get(cacheKey) as CabinSimple[];
+  const hit = await cache.exists(cacheKey);
+  if (hit) {
+    const cached = await cache.get(cacheKey);
+    return JSON.parse(cached!) as CabinSimple[];
   }
+
   const response = await client.get(
     `https://firmahytte.daysoff.no/resultater?cat=${category}`
   );
   const $ = load(response.data);
   const cabinsRaw = $("a.search-results--listings--items__item").get();
+  if (cabinsRaw.length === 0) throw new Error("Could not fetch cabins");
+
   const cabins = cabinsRaw.map((e) => ({
     link: e.attribs.href,
     title: e.attribs.title,
     image: $(e).find("img").first().attr("src")!,
   }));
 
-  cache.set(cacheKey, cabins);
+  await cache.set(cacheKey, JSON.stringify(cabins));
   return cabins;
 };
 
@@ -60,14 +67,18 @@ export const fetchCabinDetailed = async (
   cabinSimple: CabinSimple
 ): Promise<CabinDetailed> => {
   const cacheKey = `cabinDetailed-${cabinSimple.link}`;
-  if (cache.has(cacheKey)) {
-    return cache.get(cacheKey) as CabinDetailed;
+  const hit = await cache.exists(cacheKey);
+  if (hit) {
+    const cached = await cache.get(cacheKey);
+    return JSON.parse(cached!) as CabinDetailed;
   }
 
   const response = await client.get(
     `https://firmahytte.daysoff.no${cabinSimple.link}`
   );
   const $ = load(response.data);
+  if ($(".object--specifications__item").length === 0)
+    throw new Error("Could not fetch cabin details");
 
   const locationMatch = response.data.match(
     /new google.maps.LatLng\((.+), (.+)\);/
@@ -108,37 +119,35 @@ export const fetchCabinDetailed = async (
       .map((e) => $(e).find("h3").text().trim()),
   };
 
-  cache.set(cacheKey, cabinDetailed);
+  await cache.set(cacheKey, JSON.stringify(cabinDetailed));
   return cabinDetailed;
 };
 
 // Helper
 function chunk<T>(array: T[], size: number): T[][] {
   const chunkedArray = [];
-  for (var i = 0; i < array.length; i += size) {
+  for (let i = 0; i < array.length; i += size) {
     chunkedArray.push(array.slice(i, i + size));
   }
   return chunkedArray;
 }
 
-export const fetchAllCabins = async (category: Category) => {
-  if (cache.has(`category-${category}`)) {
-    return cache.get(`category-${category}`);
-  }
+export const fetchCabinsForCategory = async (
+  category: Category,
+  retry = true
+): Promise<CabinDetailed[]> => {
+  try {
+    const cabinsSimple = await fetchCabinsSimple(category);
 
-  await login();
-  const cabinsSimple = await fetchCabinsSimple(category);
-
-  let cabinsDetailed: CabinDetailed[] = [];
-  for (let cabins of chunk(cabinsSimple, 10)) {
-    const res = await Promise.all(cabins.map(fetchCabinDetailed));
-    cabinsDetailed = cabinsDetailed.concat(res);
-
-    // Only fetch 10 when developing
-    if (process.env.NODE_ENV === "development") {
-      break;
+    let cabinsDetailed: CabinDetailed[] = [];
+    for (let cabins of chunk(cabinsSimple, 30)) {
+      const res = await Promise.all(cabins.map(fetchCabinDetailed));
+      cabinsDetailed = cabinsDetailed.concat(res);
     }
+    return cabinsDetailed;
+  } catch (e) {
+    if (!retry) throw e;
+    await login();
+    return await fetchCabinsForCategory(category);
   }
-  cache.set(`category-${category}`, cabinsDetailed);
-  return cabinsDetailed;
 };
