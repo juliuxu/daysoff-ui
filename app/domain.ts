@@ -1,3 +1,7 @@
+export interface LatLng {
+  lat: string;
+  lng: string;
+}
 export enum Category {
   Mountain = 1,
   Ocean = 2,
@@ -17,7 +21,7 @@ export interface CabinDetailed {
   description: string;
   rules: Record<string, string>;
   facilities: string[];
-  location: { lat: string; lng: string };
+  location: LatLng;
   closeby: string[];
 }
 
