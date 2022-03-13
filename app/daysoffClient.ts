@@ -39,10 +39,8 @@ export const login = async () => {
 export const fetchCabinsSimple = async (
   category: Category
 ): Promise<CabinSimple[]> => {
-  const cacheKey = `cabinsSimple-${category}`;
-  const hit = await cache.exists(cacheKey);
-  if (hit) {
-    const cached = await cache.get(cacheKey);
+  const cached = await cache.hget("cabinsSimple", String(category));
+  if (cached !== null) {
     return JSON.parse(cached!) as CabinSimple[];
   }
 
@@ -59,17 +57,15 @@ export const fetchCabinsSimple = async (
     image: $(e).find("img").first().attr("src")!,
   }));
 
-  await cache.set(cacheKey, JSON.stringify(cabins));
+  await cache.hset("cabinsSimple", String(category), JSON.stringify(cabins));
   return cabins;
 };
 
 export const fetchCabinDetailed = async (
   cabinSimple: CabinSimple
 ): Promise<CabinDetailed> => {
-  const cacheKey = `cabinDetailed-${cabinSimple.link}`;
-  const hit = await cache.exists(cacheKey);
-  if (hit) {
-    const cached = await cache.get(cacheKey);
+  const cached = await cache.hget("cabins", cabinSimple.link);
+  if (cached !== null) {
     return JSON.parse(cached!) as CabinDetailed;
   }
 
@@ -119,7 +115,7 @@ export const fetchCabinDetailed = async (
       .map((e) => $(e).find("h3").text().trim()),
   };
 
-  await cache.set(cacheKey, JSON.stringify(cabinDetailed));
+  await cache.hset("cabins", cabinSimple.link, JSON.stringify(cabinDetailed));
   return cabinDetailed;
 };
 
