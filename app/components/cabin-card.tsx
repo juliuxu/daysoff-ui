@@ -1,9 +1,10 @@
-import { allowsDogs, CabinDetailed, DAYSOFF_BASEURL, hasSauna } from "~/domain";
+import type { CabinDetailed } from "~/domain";
+import { allowsDogs, DAYSOFF_BASEURL, hasSauna } from "~/domain";
 
 interface CabinCardProps {
   cabin: CabinDetailed;
 }
-const CabinCard = ({ cabin }: CabinCardProps) => {
+export const CabinCard = ({ cabin }: CabinCardProps) => {
   return (
     <article>
       <header>
@@ -21,5 +22,3 @@ const CabinCard = ({ cabin }: CabinCardProps) => {
     </article>
   );
 };
-
-export default CabinCard;

@@ -1,10 +1,10 @@
 import { useLoaderData } from "@remix-run/react";
-import { fetchCabinsForCategory } from "~/daysoffClient";
+import { fetchCabinsForCategory } from "~/service/daysoff";
 import type { CabinDetailed } from "~/domain";
 import { allowsDogs, Category } from "~/domain";
-import DebugData from "~/components/DebugData";
-import CabinCard from "~/components/CabinCard";
-import CabinTable from "~/components/CabinTable";
+import { DebugData } from "~/components/debug-data";
+import { CabinCard } from "~/components/cabin-card";
+import { CabinTable } from "~/components/cabin-table";
 import type { LoaderFunction } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 

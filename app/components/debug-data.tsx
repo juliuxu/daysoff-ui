@@ -1,6 +1,6 @@
 import React from "react";
 
-const DebugData = ({ data }: { data: any }) => {
+export const DebugData = ({ data }: { data: any }) => {
   if (typeof data === "string") return <pre>{data}</pre>;
   const entries = Object.entries(data).map(([key, value]) => (
     <React.Fragment key={key}>
@@ -12,4 +12,3 @@ const DebugData = ({ data }: { data: any }) => {
   ));
   return <>{entries}</>;
 };
-export default DebugData;

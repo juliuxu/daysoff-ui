@@ -2,8 +2,8 @@ import axios from "axios";
 import { wrapper } from "axios-cookiejar-support";
 import { CookieJar } from "tough-cookie";
 import { load } from "cheerio";
-import type { CabinDetailed, CabinSimple, Category } from "./domain";
-import { DAYSOFF_BASEURL } from "./domain";
+import type { CabinDetailed, CabinSimple, Category } from "../domain";
+import { DAYSOFF_BASEURL } from "../domain";
 
 const jar = new CookieJar();
 const client = wrapper(axios.create({ jar }));
@@ -26,7 +26,7 @@ export const login = async () => {
       _token: token,
       email: process.env.DAYSOFF_EMAIL!,
       password: process.env.DAYSOFF_PASSWORD!,
-    })
+    }),
   );
   return {
     status: response.status,
@@ -34,7 +34,7 @@ export const login = async () => {
 };
 
 export const fetchCabinsSimple = async (
-  category: Category
+  category: Category,
 ): Promise<CabinSimple[]> => {
   // const cached = await cache.hget("cabinsSimple", String(category));
   // if (cached !== null) {
@@ -42,7 +42,7 @@ export const fetchCabinsSimple = async (
   // }
 
   const response = await client.get(
-    `${DAYSOFF_BASEURL}/resultater?cat=${category}`
+    `${DAYSOFF_BASEURL}/resultater?cat=${category}`,
   );
   const $ = load(response.data);
   const cabinsRaw = $("a.search-results--listings--items__item").get();
@@ -59,7 +59,7 @@ export const fetchCabinsSimple = async (
 };
 
 export const fetchCabinDetailed = async (
-  cabinSimple: CabinSimple
+  cabinSimple: CabinSimple,
 ): Promise<CabinDetailed> => {
   const response = await client.get(`${DAYSOFF_BASEURL}${cabinSimple.link}`);
   const $ = load(response.data);
@@ -67,7 +67,7 @@ export const fetchCabinDetailed = async (
     throw new Error("Could not fetch cabin details");
 
   const locationMatch = response.data.match(
-    /new google.maps.LatLng\((.+), (.+)\);/
+    /new google.maps.LatLng\((.+), (.+)\);/,
   );
   const lat = locationMatch[1];
   const lng = locationMatch[2];
@@ -119,7 +119,7 @@ function chunk<T>(array: T[], size: number): T[][] {
 
 export const fetchCabinsForCategory = async (
   category: Category,
-  retry = true
+  retry = true,
 ): Promise<CabinDetailed[]> => {
   try {
     const cabinsSimple = await fetchCabinsSimple(category);

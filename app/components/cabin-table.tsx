@@ -1,10 +1,11 @@
 import React from "react";
-import { CabinDetailed, preparedCabin, DAYSOFF_BASEURL } from "~/domain";
+import type { CabinDetailed } from "~/domain";
+import { preparedCabin, DAYSOFF_BASEURL } from "~/domain";
 
 interface CabinsTableProps {
   cabins: CabinDetailed[];
 }
-const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
+export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
   interface SortState {
     name: string;
     dir: "🔼" | "🔽" | "";
@@ -65,7 +66,11 @@ const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
           {cabins.map((cabin) => (
             <tr key={cabin.link}>
               <td>
-                <a href={`${DAYSOFF_BASEURL}${cabin.link}`} target="_blank">
+                <a
+                  href={`${DAYSOFF_BASEURL}${cabin.link}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   {cabin.locationName} ↗
                 </a>
               </td>
@@ -81,5 +86,3 @@ const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
     </figure>
   );
 };
-
-export default CabinTable;

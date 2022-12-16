@@ -1,6 +1,6 @@
 import axios from "axios";
-import { LatLng } from "./domain";
-import { definitions } from "./geonorgeTypes";
+import type { LatLng } from "../../domain";
+import type { definitions } from "./types";
 
 // npx openapi-typescript https://ws.geonorge.no/adresser/v1/openapi.json --output geonorgeTypes.ts
 type Response = definitions["OutputAdresseList"];
@@ -13,7 +13,7 @@ export const latLngToLocation = async ({ lat, lng }: LatLng) => {
     radius: "100",
   });
   const res = await axios.get<Response>(
-    `https://ws.geonorge.no/adresser/v1/punktsok?${search}`
+    `https://ws.geonorge.no/adresser/v1/punktsok?${search}`,
   );
   const first = res.data.adresser?.[0];
   if (first === undefined) throw new Error("no geopunkt matches");
