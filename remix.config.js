@@ -1,16 +1,13 @@
-/**
- * @type {import('@remix-run/dev').AppConfig}
- */
+/** @type {import('@remix-run/dev').AppConfig} */
 module.exports = {
-  serverBuildTarget: "vercel",
-  // When running locally in development mode, we use the built in remix
-  // server. This does not understand the vercel lambda module format,
-  // so we default back to the standard build output.
-  server: process.env.NODE_ENV === "development" ? undefined : "./server.js",
-  ignoredRouteFiles: [".*"],
+  serverBuildTarget:
+    process.env.NODE_ENV === "production" ? "cloudflare-pages" : undefined,
+  server: process.env.NODE_ENV === "production" ? "./server.js" : undefined,
+
+  devServerBroadcastDelay: 1000,
+  ignoredRouteFiles: ["**/.*"],
   // appDirectory: "app",
   // assetsBuildDirectory: "public/build",
-  // serverBuildPath: "api/index.js",
+  // serverBuildPath: "functions/[[path]].js",
   // publicPath: "/build/",
-  // devServerPort: 8002
 };

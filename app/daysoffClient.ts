@@ -2,7 +2,6 @@ import axios from "axios";
 import { wrapper } from "axios-cookiejar-support";
 import { CookieJar } from "tough-cookie";
 import { load } from "cheerio";
-import Redis from "ioredis";
 import {
   CabinDetailed,
   CabinSimple,
@@ -10,9 +9,6 @@ import {
   DAYSOFF_BASEURL,
 } from "./domain";
 
-const redisClient = new Redis(process.env.REDIS_URL);
-
-const cache = redisClient;
 const jar = new CookieJar();
 const client = wrapper(axios.create({ jar }));
 
@@ -44,10 +40,10 @@ export const login = async () => {
 export const fetchCabinsSimple = async (
   category: Category
 ): Promise<CabinSimple[]> => {
-  const cached = await cache.hget("cabinsSimple", String(category));
-  if (cached !== null) {
-    return JSON.parse(cached!) as CabinSimple[];
-  }
+  // const cached = await cache.hget("cabinsSimple", String(category));
+  // if (cached !== null) {
+  //   return JSON.parse(cached!) as CabinSimple[];
+  // }
 
   const response = await client.get(
     `${DAYSOFF_BASEURL}/resultater?cat=${category}`
@@ -62,18 +58,13 @@ export const fetchCabinsSimple = async (
     image: $(e).find("img").first().attr("src")!,
   }));
 
-  await cache.hset("cabinsSimple", String(category), JSON.stringify(cabins));
+  // await cache.hset("cabinsSimple", String(category), JSON.stringify(cabins));
   return cabins;
 };
 
 export const fetchCabinDetailed = async (
   cabinSimple: CabinSimple
 ): Promise<CabinDetailed> => {
-  const cached = await cache.hget("cabins", cabinSimple.link);
-  if (cached !== null) {
-    return JSON.parse(cached!) as CabinDetailed;
-  }
-
   const response = await client.get(`${DAYSOFF_BASEURL}${cabinSimple.link}`);
   const $ = load(response.data);
   if ($(".object--specifications__item").length === 0)
@@ -118,7 +109,6 @@ export const fetchCabinDetailed = async (
       .map((e) => $(e).find("h3").text().trim()),
   };
 
-  await cache.hset("cabins", cabinSimple.link, JSON.stringify(cabinDetailed));
   return cabinDetailed;
 };
 

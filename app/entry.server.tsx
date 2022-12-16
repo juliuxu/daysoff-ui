@@ -1,9 +1,6 @@
+import type { EntryContext } from "@remix-run/server-runtime";
+import { RemixServer } from "@remix-run/react";
 import { renderToString } from "react-dom/server";
-import { RemixServer } from "remix";
-import type { EntryContext } from "remix";
-
-const dotenv = require("dotenv");
-dotenv.config();
 
 export default function handleRequest(
   request: Request,

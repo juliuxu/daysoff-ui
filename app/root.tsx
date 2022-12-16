@@ -1,3 +1,4 @@
+import type { MetaFunction } from "@remix-run/server-runtime";
 import {
   Links,
   LiveReload,
@@ -5,16 +6,17 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-} from "remix";
-import type { MetaFunction } from "remix";
+} from "@remix-run/react";
 
-export const meta: MetaFunction = () => {
-  return { title: "Daysoff UI" };
-};
+export const meta: MetaFunction = () => ({
+  title: "Daysoff UI",
+  charset: "utf-8",
+  viewport: "width=device-width,initial-scale=1",
+});
 
 export default function App() {
   return (
-    <html lang="en">
+    <html lang="no">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
