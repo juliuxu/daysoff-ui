@@ -2,12 +2,8 @@ import axios from "axios";
 import { wrapper } from "axios-cookiejar-support";
 import { CookieJar } from "tough-cookie";
 import { load } from "cheerio";
-import {
-  CabinDetailed,
-  CabinSimple,
-  Category,
-  DAYSOFF_BASEURL,
-} from "./domain";
+import type { CabinDetailed, CabinSimple, Category } from "./domain";
+import { DAYSOFF_BASEURL } from "./domain";
 
 const jar = new CookieJar();
 const client = wrapper(axios.create({ jar }));

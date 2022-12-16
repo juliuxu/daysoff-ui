@@ -1,9 +1,12 @@
-import { json, LoaderFunction, useLoaderData } from "remix";
-import { fetchCabinsForCategory, login } from "~/daysoffClient";
-import { allowsDogs, CabinDetailed, Category } from "~/domain";
+import { useLoaderData } from "@remix-run/react";
+import { fetchCabinsForCategory } from "~/daysoffClient";
+import type { CabinDetailed } from "~/domain";
+import { allowsDogs, Category } from "~/domain";
 import DebugData from "~/components/DebugData";
 import CabinCard from "~/components/CabinCard";
 import CabinTable from "~/components/CabinTable";
+import type { LoaderFunction } from "@remix-run/cloudflare";
+import { json } from "@remix-run/cloudflare";
 
 export const loader: LoaderFunction = async () => {
   let mountainCabins: CabinDetailed[];
