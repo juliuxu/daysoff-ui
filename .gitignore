@@ -1,7 +1,17 @@
 node_modules
 
 /.cache
-/build
 /public/build
+/build
 .env
-api
+.env.development
+.vscode/
+.idea/
+*.iml
+
+/app/tailwind.css
+
+.dev.vars
+/functions/\[\[path\]\].js
+/functions/\[\[path\]\].js.map
+/functions/

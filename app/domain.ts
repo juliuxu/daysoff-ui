@@ -55,3 +55,5 @@ export const preparedCabin = (cabin: CabinDetailed) => ({
     return Number(cabin.specifications.Soverom);
   },
 });
+
+export const DAYSOFF_BASEURL = "https://firmahytte.daysoff.no";

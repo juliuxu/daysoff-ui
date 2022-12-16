@@ -3,7 +3,12 @@ import { wrapper } from "axios-cookiejar-support";
 import { CookieJar } from "tough-cookie";
 import { load } from "cheerio";
 import Redis from "ioredis";
-import { CabinDetailed, CabinSimple, Category } from "./domain";
+import {
+  CabinDetailed,
+  CabinSimple,
+  Category,
+  DAYSOFF_BASEURL,
+} from "./domain";
 
 const redisClient = new Redis(process.env.REDIS_URL);
 
@@ -18,13 +23,13 @@ const fetchToken = async () => {
     if (token === undefined) throw new Error("could not fetch token");
     return token;
   };
-  const html = await client.get("https://firmahytte.daysoff.no/");
+  const html = await client.get(`${DAYSOFF_BASEURL}/`);
   return parseToken(html.data);
 };
 export const login = async () => {
   const token = await fetchToken();
   const response = await client.post(
-    "https://firmahytte.daysoff.no/check",
+    `${DAYSOFF_BASEURL}/check`,
     new URLSearchParams({
       _token: token,
       email: process.env.DAYSOFF_EMAIL!,
@@ -45,7 +50,7 @@ export const fetchCabinsSimple = async (
   }
 
   const response = await client.get(
-    `https://firmahytte.daysoff.no/resultater?cat=${category}`
+    `${DAYSOFF_BASEURL}/resultater?cat=${category}`
   );
   const $ = load(response.data);
   const cabinsRaw = $("a.search-results--listings--items__item").get();
@@ -69,9 +74,7 @@ export const fetchCabinDetailed = async (
     return JSON.parse(cached!) as CabinDetailed;
   }
 
-  const response = await client.get(
-    `https://firmahytte.daysoff.no${cabinSimple.link}`
-  );
+  const response = await client.get(`${DAYSOFF_BASEURL}${cabinSimple.link}`);
   const $ = load(response.data);
   if ($(".object--specifications__item").length === 0)
     throw new Error("Could not fetch cabin details");
