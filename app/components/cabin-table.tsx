@@ -1,9 +1,10 @@
 import React from "react";
-import type { CabinDetailed } from "~/domain";
-import { preparedCabin, DAYSOFF_BASEURL } from "~/domain";
+import { config } from "~/config";
+import type { Cabin } from "~/domain";
+import { preparedCabin } from "~/domain";
 
 interface CabinsTableProps {
-  cabins: CabinDetailed[];
+  cabins: Cabin[];
 }
 export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
   interface SortState {
@@ -67,7 +68,7 @@ export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
             <tr key={cabin.link}>
               <td>
                 <a
-                  href={`${DAYSOFF_BASEURL}${cabin.link}`}
+                  href={`${config.DAYSOFF_BASEURL}${cabin.link}`}
                   target="_blank"
                   rel="noreferrer"
                 >

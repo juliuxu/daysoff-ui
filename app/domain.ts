@@ -8,12 +8,12 @@ export enum Category {
   Abroad = 3,
 }
 
-export interface CabinSimple {
+export interface CabinShallow {
   link: string;
   title: string;
   image: string;
 }
-export interface CabinDetailed {
+export interface Cabin {
   link: string;
   title: string;
   images: string[];
@@ -26,14 +26,13 @@ export interface CabinDetailed {
 }
 
 // Domain functions
-export const allowsDogs = (cabin: CabinDetailed) =>
+export const allowsDogs = (cabin: Cabin) =>
   cabin.rules.Husregler?.includes("Tillat med husdyr") &&
   !cabin.rules.Husregler?.includes("Ikke tillat med husdyr");
 
-export const hasSauna = (cabin: CabinDetailed) =>
-  cabin.facilities.includes("Badstue");
+export const hasSauna = (cabin: Cabin) => cabin.facilities.includes("Badstue");
 
-export const preparedCabin = (cabin: CabinDetailed) => ({
+export const preparedCabin = (cabin: Cabin) => ({
   ...cabin,
 
   get locationName() {
@@ -55,5 +54,3 @@ export const preparedCabin = (cabin: CabinDetailed) => ({
     return Number(cabin.specifications.Soverom);
   },
 });
-
-export const DAYSOFF_BASEURL = "https://firmahytte.daysoff.no";

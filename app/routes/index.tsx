@@ -1,28 +1,29 @@
 import { useLoaderData } from "@remix-run/react";
-import { fetchCabinsForCategory } from "~/service/daysoff";
-import type { CabinDetailed } from "~/domain";
+import type { Cabin } from "~/domain";
 import { allowsDogs, Category } from "~/domain";
 import { DebugData } from "~/components/debug-data";
 import { CabinCard } from "~/components/cabin-card";
 import { CabinTable } from "~/components/cabin-table";
-import type { LoaderFunction } from "@remix-run/cloudflare";
+import type { LoaderArgs, LoaderFunction } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
+import { CachedDaysoffApi } from "~/service/daysoff/cf-cached-api";
 
-export const loader: LoaderFunction = async () => {
-  let mountainCabins: CabinDetailed[];
-  mountainCabins = await fetchCabinsForCategory(Category.Mountain);
+export const loader: LoaderFunction = async ({ context }: LoaderArgs) => {
+  const mountainCabins = await new CachedDaysoffApi(
+    context,
+  ).fetchCabinsForCategory(Category.Mountain);
   return json(mountainCabins);
 };
 
 export default function Index() {
-  const cabins = useLoaderData<CabinDetailed[]>();
+  const cabins = useLoaderData<Cabin[]>();
 
   return (
     <>
-      <header className="container">
+      <header>
         <h1>Bedre daysoff visning</h1>
       </header>
-      <main className="container">
+      <main>
         <section>
           <fieldset onChange={(e) => console.log({ e: e.target })}>
             <legend>
