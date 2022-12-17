@@ -1,8 +1,8 @@
 import { useLoaderData } from "@remix-run/react";
 import type { Cabin } from "~/domain";
+import { fixDates } from "~/domain";
 import { allowsDogs, Category } from "~/domain";
-import { DebugData } from "~/components/debug-data";
-import { CabinCard } from "~/components/cabin-card";
+
 import { CabinTable } from "~/components/cabin-table";
 import type { LoaderArgs, LoaderFunction } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
@@ -11,12 +11,14 @@ import { CachedDaysoffApi } from "~/service/daysoff/cf-cached-api";
 export const loader: LoaderFunction = async ({ context }: LoaderArgs) => {
   const mountainCabins = await new CachedDaysoffApi(
     context,
+    {},
   ).fetchCabinsForCategory(Category.Mountain);
   return json(mountainCabins);
 };
 
 export default function Index() {
-  const cabins = useLoaderData<Cabin[]>();
+  const cabinsRaw = useLoaderData<Cabin[]>();
+  const cabins = fixDates(cabinsRaw);
 
   return (
     <>
@@ -51,10 +53,10 @@ export default function Index() {
         <br />
         Count allow dogs: {cabins.filter((cabin) => allowsDogs(cabin)).length}
         <CabinTable cabins={cabins} />
-        {cabins.map((cabin) => (
+        {/* {cabins.map((cabin) => (
           <CabinCard key={cabin.link} cabin={cabin} />
-        ))}
-        <DebugData data={cabins} />
+        ))} */}
+        {/* <DebugData data={cabins} /> */}
       </main>
     </>
   );

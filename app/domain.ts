@@ -1,3 +1,6 @@
+import type { SerializeFrom } from "@remix-run/cloudflare";
+
+// Domain
 export interface LatLng {
   lat: string;
   lng: string;
@@ -23,7 +26,26 @@ export interface Cabin {
   facilities: string[];
   location: LatLng;
   closeby: string[];
+  availableBookingPeriods: AvailableBookingPeriod[];
 }
+
+export type AvailableBookingPeriod = {
+  from: Date;
+  to: Date;
+  price: number[];
+  fullPeriodMandetory?: boolean;
+};
+
+// Fix Date
+export const fixDates = (cabinsRaw: SerializeFrom<Cabin[]>) =>
+  cabinsRaw.map<Cabin>((cabin) => ({
+    ...cabin,
+    availableBookingPeriods: cabin.availableBookingPeriods.map((x) => ({
+      ...x,
+      from: new Date(x.from),
+      to: new Date(x.from),
+    })),
+  }));
 
 // Domain functions
 export const allowsDogs = (cabin: Cabin) =>

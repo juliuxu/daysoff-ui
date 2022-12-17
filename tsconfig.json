@@ -3,7 +3,8 @@
     "remix.env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "app/service/geonorge/types.ts"
+    "app/service/geonorge/types.ts",
+    "app/routes/rebuild-cache.ts"
   ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],

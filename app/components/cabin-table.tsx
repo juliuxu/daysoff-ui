@@ -55,6 +55,7 @@ export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
       <table>
         <thead>
           <tr>
+            {Th("Tittel")}
             {Th("Lokasjon")}
             {Th("Soverom")}
             {Th("Hunder")}
@@ -66,6 +67,7 @@ export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
         <tbody>
           {cabins.map((cabin) => (
             <tr key={cabin.link}>
+              <td>{cabin.title}</td>
               <td>
                 <a
                   href={`${config.DAYSOFF_BASEURL}${cabin.link}`}

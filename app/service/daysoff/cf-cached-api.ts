@@ -10,24 +10,44 @@ import {
 } from "./api";
 
 // TODO: Implement max-age and stale-while-revalidate
+type Metadata = {
+  createdDate: string;
+};
+type CacheOptions = {
+  maxAge: number;
+};
 const kvCachedRequest = async <T>(
   kv: KVNamespace,
   key: string,
+  options: CacheOptions,
   fn: () => T,
 ) => {
-  let value = await kv.get<T>(key, "json");
-  if (value) return value;
+  let { value, metadata } = await kv.getWithMetadata<T, Metadata>(key, "json");
+  const createdDate = metadata?.createdDate && new Date(metadata.createdDate);
+  const now = new Date();
+  if (
+    value &&
+    createdDate &&
+    (now.getTime() - createdDate.getTime()) / 1000 < options.maxAge
+  ) {
+    return value;
+  }
 
   value = await fn();
 
-  await kv.put(key, JSON.stringify(value));
+  metadata = { createdDate: new Date().toISOString() };
+  await kv.put(key, JSON.stringify(value), {
+    metadata,
+  });
   return value;
 };
 
 export class CachedDaysoffApi {
   #context: AppLoadContext;
-  constructor(context: AppLoadContext) {
+  #cacheOptions: CacheOptions;
+  constructor(context: AppLoadContext, cacheOptions: Partial<CacheOptions>) {
     this.#context = context;
+    this.#cacheOptions = { maxAge: Infinity, ...cacheOptions };
   }
   get #kv() {
     const kv = this.#context[config.KV_NAMESPACE] as KVNamespace;
@@ -37,25 +57,34 @@ export class CachedDaysoffApi {
   }
 
   fetchCabinsShallowForCategory = (category: Category) =>
-    kvCachedRequest(this.#kv, `fetchCabinsShallowForCategory-${category}`, () =>
-      authenticatedRequest(
-        () => fetchCabinsShallowForCategory(category),
-        getAuth(this.#context),
-      ),
+    kvCachedRequest(
+      this.#kv,
+      `fetchCabinsShallowForCategory-${category}`,
+      this.#cacheOptions,
+      () =>
+        authenticatedRequest(
+          () => fetchCabinsShallowForCategory(category),
+          getAuth(this.#context),
+        ),
     );
 
   fetchCabin = (cabinShallow: CabinShallow) =>
-    kvCachedRequest(this.#kv, `fetchCabin-${cabinShallow.link}`, () =>
-      authenticatedRequest(
-        () => fetchCabin(cabinShallow),
-        getAuth(this.#context),
-      ),
+    kvCachedRequest(
+      this.#kv,
+      `fetchCabin-${cabinShallow.link}`,
+      this.#cacheOptions,
+      () =>
+        authenticatedRequest(
+          () => fetchCabin(cabinShallow),
+          getAuth(this.#context),
+        ),
     );
 
   fetchCabinsForCategory = (category: Category) =>
     kvCachedRequest(
       this.#kv,
       `fetchCabinsForCategory-${category}`,
+      this.#cacheOptions,
       async () => {
         const cabinsShallow = await this.fetchCabinsShallowForCategory(
           category,
