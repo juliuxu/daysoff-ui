@@ -1,5 +1,12 @@
 import { load } from "cheerio";
-import type { Cabin, CabinShallow, AvailableBookingPeriod } from "~/domain";
+import type {
+  Cabin,
+  CabinShallow,
+  AvailableBookingPeriod,
+  PriceMap,
+  PriceData,
+  SpecialPricePeriod,
+} from "~/domain";
 
 export const parseCabinsShallow = (data: string): CabinShallow[] => {
   const $ = load(data);
@@ -60,24 +67,62 @@ export const parseCabin = (data: string, link: string): Cabin => {
       .get()
       .map((e) => $(e).find("h3").text().trim()),
     availableBookingPeriods: parseAvailableBookingPeriods(data),
+    priceData: parsePriceData(data),
   };
 
   return cabin;
 };
 
-const parseAvailableBookingPeriods = (
-  data: string,
-): AvailableBookingPeriod[] => {
+const parsePriceData = (data: string): PriceData => {
   // Parse
-  const dateData = JSON.parse(
-    data.match(/const datedata = (.+);/)?.[1] ?? "[]",
-  ) as DaysoffResponseDateData[];
+  const landlord_discount = Number(
+    data.match(/const landlord_discount = (\d+);/)?.[1],
+  );
+  const applyLandlordDiscount = (n: number) =>
+    n * ((100 - landlord_discount) / 100);
+
   const specialPriceData = JSON.parse(
     data.match(/const specialpricedata = (.+);/)?.[1] ?? "[]",
-  ) as DaysoffResponseSpecialPriceData[];
+  ) as Record<string, DaysoffResponseSpecialPriceData>;
   const priceData = JSON.parse(
     data.match(/const pricedata = (.+);/)?.[1] ?? "[]",
   ) as DaysoffResponsePriceData[];
+
+  const result: PriceData = {
+    specialPricePeriods: [],
+  };
+
+  // Prepare special price periods
+  result.specialPricePeriods = Object.values(specialPriceData)
+    .sort((a, b) => (a.date_from < b.date_from ? -1 : 1))
+    .map<SpecialPricePeriod>((x) => ({
+      from: new Date(x.date_from),
+      to: new Date(x.date_to),
+      price: x.price.map(Number).map(applyLandlordDiscount)[0],
+    }));
+
+  // Prepare price map
+  for (const year of priceData) {
+    result[Number(year.year)] = {};
+    for (const monthsChunk of year.data) {
+      const prices = monthsChunk.prices.map(Number).map(applyLandlordDiscount);
+      (monthsChunk.months ?? [...Array(12).keys()])
+        .map(Number)
+        .forEach((month) => {
+          result[Number(year.year)][month] = prices;
+        });
+    }
+  }
+
+  return result;
+};
+
+const parseAvailableBookingPeriods = (
+  data: string,
+): AvailableBookingPeriod[] => {
+  const dateData = JSON.parse(
+    data.match(/const datedata = (.+);/)?.[1] ?? "[]",
+  ) as DaysoffResponseDateData[];
 
   // Prepare
   // Calculdate 2 years from now
@@ -88,6 +133,8 @@ const parseAvailableBookingPeriods = (
 
   const sortedDateData = dateData
     .slice()
+    // Lets worry about the mandatory-period later
+    .filter((x) => x.type === "blocked")
     .sort((a, b) => (a.time_from < b.time_from ? -1 : 1));
   const boundedDateData: DaysoffResponseDateData[] = [
     { time_from: "2000-01-01", time_to: start.toISOString(), type: "blocked" },
@@ -105,7 +152,6 @@ const parseAvailableBookingPeriods = (
       result.push({
         from: current,
         to: blockedFrom,
-        price: [],
       });
     }
 
@@ -116,11 +162,6 @@ const parseAvailableBookingPeriods = (
 };
 
 // Response
-export type DaysoffResponseBookingData = {
-  dateData: DaysoffResponseDateData[];
-  specialPriceData: DaysoffResponseSpecialPriceData[];
-  priceData: DaysoffResponsePriceData[];
-};
 export type DaysoffResponseDateData = {
   time_from: string;
   time_to: string;
@@ -134,7 +175,7 @@ export type DaysoffResponseSpecialPriceData = {
 export type DaysoffResponsePriceData = {
   year: string; // "2022"
   data: {
-    months: string[]; // ["10", "11"]
+    months?: string[]; // ["10", "11"]
     prices: string[]; // ["1200", "1200", "1200", "1200", "2400", "2400", "1200"]
     matrix: number; // 19
   }[];

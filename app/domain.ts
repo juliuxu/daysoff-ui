@@ -27,13 +27,30 @@ export interface Cabin {
   location: LatLng;
   closeby: string[];
   availableBookingPeriods: AvailableBookingPeriod[];
+  priceData: PriceData;
 }
 
 export type AvailableBookingPeriod = {
   from: Date;
   to: Date;
-  price: number[];
   fullPeriodMandetory?: boolean;
+};
+
+export type SpecialPricePeriod = {
+  from: Date;
+  to: Date;
+  price: number;
+};
+export type PriceMap = {
+  [year: number]: {
+    [month: number]: {
+      // Sunday is 0, monday is 1, etc..
+      [weekday: number]: number;
+    };
+  };
+};
+export type PriceData = PriceMap & {
+  specialPricePeriods: SpecialPricePeriod[];
 };
 
 // Fix Date
@@ -43,9 +60,32 @@ export const fixDates = (cabinsRaw: SerializeFrom<Cabin[]>) =>
     availableBookingPeriods: cabin.availableBookingPeriods.map((x) => ({
       ...x,
       from: new Date(x.from),
-      to: new Date(x.from),
+      to: new Date(x.to),
     })),
+    priceData: {
+      ...cabin.priceData,
+      specialPricePeriods: cabin.priceData.specialPricePeriods.map((x) => ({
+        ...x,
+        from: new Date(x.from),
+        to: new Date(x.to),
+      })),
+    },
   }));
+
+// TODO: Test out performance
+export const fixDatesInline = (cabinsRaw: SerializeFrom<Cabin[]>) => {
+  for (const cabin of cabinsRaw) {
+    for (const x of cabin.availableBookingPeriods) {
+      (x as any).from = new Date(x.from);
+      (x as any).to = new Date(x.to);
+    }
+    for (const x of cabin.priceData.specialPricePeriods) {
+      (x as any).from = new Date(x.from);
+      (x as any).to = new Date(x.to);
+    }
+  }
+  return cabinsRaw as any as Cabin[];
+};
 
 // Domain functions
 export const allowsDogs = (cabin: Cabin) =>

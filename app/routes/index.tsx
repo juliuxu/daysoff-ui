@@ -4,21 +4,22 @@ import { fixDates } from "~/domain";
 import { allowsDogs, Category } from "~/domain";
 
 import { CabinTable } from "~/components/cabin-table";
-import type { LoaderArgs, LoaderFunction } from "@remix-run/cloudflare";
+import type { LoaderArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { CachedDaysoffApi } from "~/service/daysoff/cf-cached-api";
 
-export const loader: LoaderFunction = async ({ context }: LoaderArgs) => {
+export const loader = async ({ context }: LoaderArgs) => {
   const mountainCabins = await new CachedDaysoffApi(
     context,
     {},
   ).fetchCabinsForCategory(Category.Mountain);
+
   return json(mountainCabins);
 };
 
 export default function Index() {
-  const cabinsRaw = useLoaderData<Cabin[]>();
-  const cabins = fixDates(cabinsRaw);
+  const rawCabins = useLoaderData<typeof loader>();
+  const cabins = fixDates(rawCabins);
 
   return (
     <>
