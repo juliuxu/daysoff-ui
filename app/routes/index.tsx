@@ -46,10 +46,10 @@ export const loader = async ({ context, request }: LoaderArgs) => {
     input.category,
   );
 
-  cabins = cabins
-
-    // Filter by features
-    .filter((cabin) => input.features.every((p) => cabinFeatures[p](cabin)));
+  // Filter by features
+  cabins = cabins.filter((cabin) =>
+    input.features.every((p) => cabinFeatures[p](cabin)),
+  );
 
   // Selected date ranges
   const byAvailableDates = input.dates.map((daterange) => ({
@@ -60,11 +60,10 @@ export const loader = async ({ context, request }: LoaderArgs) => {
     byAvailableDates.flatMap((x) => x.cabins).map((x) => x.link),
   );
 
-  cabins = cabins
-    // Filter by available
-    .filter(
-      (cabin) => input.dates.length === 0 || availableCabins.has(cabin.link),
-    );
+  // Filter by availability
+  cabins = cabins.filter(
+    (cabin) => input.dates.length === 0 || availableCabins.has(cabin.link),
+  );
 
   return json({ cabins, byAvailableDates, input });
 };
