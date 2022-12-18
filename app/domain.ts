@@ -95,6 +95,15 @@ export enum CabinProperty {
 }
 
 // Domain functions
+export const isAvailableForPeriod = (
+  cabin: Cabin,
+  [from, to]: [from: Date, to: Date],
+) =>
+  cabin.availableBookingPeriods.some(
+    (availableBookingPeriod) =>
+      availableBookingPeriod.from <= from && to <= availableBookingPeriod.to,
+  );
+
 export const allowsDogs = (cabin: Cabin) =>
   cabin.rules.Husregler?.includes("Tillat med husdyr") &&
   !cabin.rules.Husregler?.includes("Ikke tillat med husdyr");

@@ -1,7 +1,12 @@
 import { Form, useLoaderData, useSubmit } from "@remix-run/react";
 import { z } from "zod";
 
-import { cabinProperties, CabinProperty, fixDatesInline } from "~/domain";
+import {
+  cabinProperties,
+  CabinProperty,
+  fixDatesInline,
+  isAvailableForPeriod,
+} from "~/domain";
 import { Category } from "~/domain";
 
 import { CabinTable } from "~/components/cabin-table";
@@ -37,9 +42,26 @@ export const loader = async ({ context, request }: LoaderArgs) => {
     input.category,
   );
 
-  const filteredCabins = cabins.filter((cabin) =>
-    input.properties.every((p) => cabinProperties[p](cabin)),
+  // Selected date ranges
+  const byAvailableDates = input.dates.map((daterange) => ({
+    daterange,
+    cabins: cabins.filter((cabin) => isAvailableForPeriod(cabin, daterange)),
+  }));
+  const availableCabins = new Set(
+    byAvailableDates.flatMap((x) => x.cabins).map((x) => x.link),
   );
+
+  const filteredCabins = cabins
+
+    // Filter by available
+    .filter(
+      (cabin) => input.dates.length === 0 || availableCabins.has(cabin.link),
+    )
+
+    // Filter by properties
+    .filter((cabin) =>
+      input.properties.every((p) => cabinProperties[p](cabin)),
+    );
 
   return json({ cabins: filteredCabins, input });
 };
