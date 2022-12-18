@@ -61,8 +61,29 @@ export const authenticatedRequest = async <T>(
   }
 };
 
+const setSearchCategory = async (category: Category) => {
+  const token = await fetchToken();
+
+  const formData = new FormData();
+  formData.set("_token", token);
+  formData.set("category", category);
+
+  const response = await daysoffFetch(
+    `${config.DAYSOFF_BASEURL}/changeSearchCategoryFilter`,
+    {
+      method: "POST",
+      body: formData,
+    },
+  );
+
+  return {
+    status: response.status,
+  };
+};
+
 export const ERROR_CAUSE_REDIRECT_RESPONSE = "ERROR_CAUSE_REDIRECT_RESPONSE";
 export const fetchCabinsShallowForCategory = async (category: Category) => {
+  await setSearchCategory(category);
   const response = await daysoffFetch(
     `${config.DAYSOFF_BASEURL}/resultater?cat=${category}`,
     {

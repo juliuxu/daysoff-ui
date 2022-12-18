@@ -103,7 +103,7 @@ export default function Index() {
 
 const CategoryTitles: Record<Category, React.ReactNode> = {
   [Category.Mountain]: "Fjellet 🗻",
-  [Category.Ocean]: "Ved sjøen 🌊",
+  [Category.Ocean]: "Sjøen 🌊",
   [Category.Abroad]: "Utlandet ☀️",
 };
 const CabinPropertyTitles: Record<CabinProperty, React.ReactNode> = {
