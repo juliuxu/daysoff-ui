@@ -21,7 +21,7 @@ const fetchToken = async () => {
   return parseToken(text);
 };
 
-const login = async ({
+export const login = async ({
   email,
   password,
 }: {

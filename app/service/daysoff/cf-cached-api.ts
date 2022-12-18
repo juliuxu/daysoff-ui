@@ -8,6 +8,7 @@ import {
   authenticatedRequest,
   fetchCabin,
   fetchCabinsShallowForCategory,
+  login,
 } from "./api";
 
 // TODO: Implement max-age and stale-while-revalidate
@@ -56,6 +57,8 @@ export class CachedDaysoffApi {
       throw new Error(`kv namespace ${config.KV_NAMESPACE} not available`);
     return kv;
   }
+
+  login = () => login(getAuth(this.#context));
 
   fetchCabinsShallowForCategory = (category: Category) =>
     kvCachedRequest(

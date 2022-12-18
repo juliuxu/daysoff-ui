@@ -17,6 +17,10 @@ export const loader = async ({ context, request }: LoaderArgs) => {
   });
 
   const api = new CachedDaysoffApi(context, { maxAge: 60 * 10 });
+
+  // Ensure logged in
+  await api.login();
+
   if (input.category) {
     return json({
       [input.category]: await api.fetchCabinsForCategory(input.category),
