@@ -2,7 +2,7 @@ import makeFetchCookie from "fetch-cookie";
 import { load } from "cheerio";
 import type { CabinShallow, Category, Cabin } from "~/domain";
 import { parseCabin, parseCabinsShallow } from "./parsers";
-import { chunked } from "~/utils/misc";
+import { chunked, uniqueBy } from "~/utils/misc";
 import { config } from "~/config";
 
 const daysoffFetch = makeFetchCookie(fetch);
@@ -94,7 +94,9 @@ export const fetchCabinsShallowForCategory = async (category: Category) => {
     throw new Error("Got redirect", { cause: ERROR_CAUSE_REDIRECT_RESPONSE });
   }
 
-  const data = parseCabinsShallow(await response.text());
+  let data = parseCabinsShallow(await response.text());
+  // The daysoff service seems to display duplicates
+  data = uniqueBy(data, (x) => x.link);
   return data;
 };
 
