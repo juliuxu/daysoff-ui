@@ -58,7 +58,6 @@ export default function Index() {
         <section>
           <Form
             onChange={(e) => {
-              console.log("got onChange", e);
               submit(e.currentTarget);
             }}
           >
