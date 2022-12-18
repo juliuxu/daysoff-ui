@@ -1,6 +1,8 @@
 import type { SerializeFrom } from "@remix-run/cloudflare";
+import { datesBetween } from "./utils/misc";
 
 // Domain
+export type DatePeriod = [from: Date, to: Date];
 export interface LatLng {
   lat: string;
   lng: string;
@@ -51,6 +53,32 @@ export type PriceMap = {
 };
 export type PriceData = PriceMap & {
   specialPricePeriods: SpecialPricePeriod[];
+};
+
+const getPriceForDay = (cabin: Cabin, date: Date) => {
+  // FIrst check special price
+
+  // TODO
+  // const specialPricePeriod = cabin.priceData.specialPricePeriods.find(
+  //   (x) => x.from >= date && date <= x.to,
+  // );
+  // if (specialPricePeriod) return specialPricePeriod.price;
+
+  const res =
+    cabin.priceData[date.getFullYear()]?.[date.getMonth()]?.[date.getDay()];
+
+  return res ?? -99999;
+};
+export const getPriceForPeriod = (cabin: Cabin, datePeriod: DatePeriod) => {
+  const cleaningFee = Number(cabin.rules.Utvask?.match(/(\d+) NOK/)?.[1] ?? 0);
+
+  return (
+    cleaningFee +
+    datesBetween(datePeriod)
+      .slice(0, -1)
+      .map((x) => getPriceForDay(cabin, x))
+      .reduce((acc, x) => acc + x, 0)
+  );
 };
 
 // Fix Date

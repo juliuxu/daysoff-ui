@@ -1,11 +1,13 @@
 import { Form, useLoaderData, useSubmit } from "@remix-run/react";
 import { z } from "zod";
 
+import type { DatePeriod } from "~/domain";
 import {
   cabinFeatures,
   CabinFeature,
   fixDatesInline,
   isAvailableForPeriod,
+  getPriceForPeriod,
 } from "~/domain";
 import { Category } from "~/domain";
 
@@ -15,6 +17,7 @@ import { redirect } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { CachedDaysoffApi } from "~/service/daysoff/cf-cached-api";
 import { DaterangeList } from "~/components/daterange-list";
+import { daterangeFormat, daterangeId } from "~/utils/misc";
 
 const dateRangeSchema = z.preprocess((arg) => {
   if (typeof arg == "string") {
@@ -67,6 +70,10 @@ export const loader = async ({ context, request }: LoaderArgs) => {
 export default function Index() {
   const data = useLoaderData<typeof loader>();
   const cabins = fixDatesInline(data.cabins);
+  const byAvailableDates = data.byAvailableDates.map((x) => ({
+    ...x,
+    cabins: fixDatesInline(x.cabins),
+  }));
   const submit = useSubmit();
 
   return (
@@ -122,6 +129,23 @@ export default function Index() {
           </Form>
         </section>
         Count: {cabins.length}
+        {/* By available dates */}
+        <h2>Datoer</h2>
+        {byAvailableDates.map(({ cabins, daterange }) => (
+          <div key={daterangeId(daterange)}>
+            <h3>{daterangeFormat(daterange)}</h3>
+            {cabins.map((cabin) => (
+              <div key={cabin.link}>
+                {getPriceForPeriod(cabin, [
+                  new Date(daterange[0]),
+                  new Date(daterange[1]),
+                ])}{" "}
+                - {cabin.title}
+              </div>
+            ))}
+          </div>
+        ))}
+        <h2>Alle</h2>
         <CabinTable cabins={cabins} />
         {/* {cabins.map((cabin) => (
           <CabinCard key={cabin.link} cabin={cabin} />

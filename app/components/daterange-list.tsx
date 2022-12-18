@@ -1,9 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-
-const formatter = new Intl.DateTimeFormat("no-nb", { dateStyle: "full" });
-const daterangeId = ([from, to]: Daterange) => `${from}:${to}`;
-const daterangeFormat = ([from, to]: Daterange) =>
-  formatter.formatRange(new Date(from), new Date(to));
+import { daterangeId, daterangeFormat } from "~/utils/misc";
 
 type Daterange = [from: string, to: string];
 interface DaterangeListProps {
