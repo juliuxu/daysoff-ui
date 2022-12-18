@@ -1,6 +1,7 @@
 import React from "react";
 import { config } from "~/config";
 import type { Cabin } from "~/domain";
+import { cabinPropertyValues } from "~/domain";
 import { CabinAttribute } from "~/domain";
 import { cabinProperties } from "~/domain";
 import { cabinPropertyTitles } from "~/domain";
@@ -74,7 +75,7 @@ export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
                 );
               }
               return (
-                <td key={key}>{cabinProperties[key as SortKey](cabin)}</td>
+                <td key={key}>{cabinPropertyValues[key as SortKey](cabin)}</td>
               );
             })}
           </tr>
