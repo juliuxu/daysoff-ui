@@ -18,6 +18,7 @@ import { json } from "@remix-run/cloudflare";
 import { CachedDaysoffApi } from "~/service/daysoff/cf-cached-api";
 import { DaterangeList } from "~/components/daterange-list";
 import { daterangeFormat, daterangeId } from "~/utils/misc";
+import { config } from "~/config";
 
 const dateRangeSchema = z.preprocess((arg) => {
   if (typeof arg == "string") {
@@ -141,7 +142,14 @@ export default function Index() {
                   new Date(daterange[0]),
                   new Date(daterange[1]),
                 ])}{" "}
-                - {cabin.title}
+                -{" "}
+                <a
+                  href={`${config.DAYSOFF_BASEURL}${cabin.link}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {cabin.title}
+                </a>
               </div>
             ))}
           </div>
