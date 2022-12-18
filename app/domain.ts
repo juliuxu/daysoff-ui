@@ -65,10 +65,6 @@ const getPriceForDay = (cabin: Cabin, date: Date) => {
   const res =
     cabin.priceData[date.getFullYear()]?.[date.getMonth()]?.[date.getDay()];
 
-  if (cabin.title.includes("Flott toppleilighet på Geilo med gode")) {
-    console.log(date, cabin.priceData);
-  }
-
   return res ?? -999999;
 };
 export const getPriceForPeriod = (cabin: Cabin, datePeriod: DatePeriod) => {
