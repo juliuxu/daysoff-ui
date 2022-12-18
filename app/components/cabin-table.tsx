@@ -23,8 +23,8 @@ export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
   });
   const toggleSortState = (name: SortKey) =>
     setSortState((current) => {
-      if (name !== current.name) return { name, dir: "🔼" };
-      else if (current.dir === "") return { name, dir: "🔼" };
+      if (name !== current.name) return { name, dir: "🔽" };
+      else if (current.dir === "") return { name, dir: "🔽" };
       else if (current.dir === "🔼") return { name, dir: "🔽" };
       else return { name, dir: "🔼" };
     });
