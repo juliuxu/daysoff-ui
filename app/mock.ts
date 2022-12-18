@@ -531,3 +531,107 @@ export const mock = () => {
     },
   ];
 };
+
+export const mock2 = () => {
+  const datedata = [
+    { time_from: "2020-02-24", time_to: "2020-03-01", type: "blocked" },
+    { time_from: "2022-10-21", time_to: "2022-10-23", type: "blocked" },
+    { time_from: "2023-10-02", time_to: "2024-05-01", type: "blocked" },
+    { time_from: "2023-04-05", time_to: "2023-04-10", type: "blocked" },
+    { time_from: "2023-01-05", time_to: "2023-01-09", type: "blocked" },
+    { time_from: "2023-04-20", time_to: "2023-04-23", type: "blocked" },
+    { time_from: "2023-02-07", time_to: "2023-02-14", type: "blocked" },
+    { time_from: "2023-01-25", time_to: "2023-01-29", type: "blocked" },
+    { time_from: "2023-01-30", time_to: "2023-02-03", type: "blocked" },
+    { time_from: "2023-01-11", time_to: "2023-01-15", type: "blocked" },
+    { time_from: "2023-03-31", time_to: "2023-04-05", type: "blocked" },
+    { time_from: "2023-02-22", time_to: "2023-02-26", type: "blocked" },
+    { time_from: "2023-03-17", time_to: "2023-03-19", type: "blocked" },
+    { time_from: "2022-12-15", time_to: "2022-12-19", type: "blocked" },
+    { time_from: "2022-12-28", time_to: "2023-01-02", type: "blocked" },
+    { time_from: "2023-02-16", time_to: "2023-02-22", type: "blocked" },
+    { time_from: "2023-03-09", time_to: "2023-03-12", type: "blocked" },
+    { time_from: "2023-01-16", time_to: "2023-01-22", type: "blocked" },
+    { time_from: "2023-03-24", time_to: "2023-03-26", type: "blocked" },
+    { time_from: "2023-02-03", time_to: "2023-02-05", type: "blocked" },
+    { time_from: "2023-03-02", time_to: "2023-03-05", type: "blocked" },
+    { time_from: "2023-04-13", time_to: "2023-04-17", type: "blocked" },
+    { time_from: "2022-12-22", time_to: "2022-12-28", type: "blocked" },
+    { time_from: "2023-04-28", time_to: "2023-04-30", type: "blocked" },
+    { time_from: "2023-03-20", time_to: "2023-03-23", type: "blocked" },
+    { time_from: "2022-12-19", time_to: "2022-12-22", type: "blocked" },
+    { time_from: "2023-03-12", time_to: "2023-03-17", type: "blocked" },
+  ];
+  const specialpricedata = [];
+  const pricedata = [
+    {
+      year: "2021",
+      data: [
+        {
+          months: [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+          ],
+          prices: ["100", "100", "100", "100", "100", "100", "100"],
+          matrix: 192,
+        },
+      ],
+    },
+    {
+      year: "2022",
+      data: [
+        {
+          months: [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+          ],
+          prices: ["0", "0", "0", "0", "0", "0", "0"],
+          matrix: 65,
+        },
+      ],
+    },
+    {
+      year: "2023",
+      data: [
+        {
+          months: [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+          ],
+          prices: ["0", "0", "0", "0", "0", "0", "0"],
+          matrix: 39,
+        },
+      ],
+    },
+  ];
+};

@@ -68,7 +68,7 @@ export const parseCabin = (data: string, link: string): Cabin => {
 const parseAvailableBookingPeriods = (
   data: string,
 ): AvailableBookingPeriod[] => {
-  // Booking
+  // Parse
   const dateData = JSON.parse(
     data.match(/const datedata = (.+);/)?.[1] ?? "[]",
   ) as DaysoffResponseDateData[];
@@ -79,7 +79,40 @@ const parseAvailableBookingPeriods = (
     data.match(/const pricedata = (.+);/)?.[1] ?? "[]",
   ) as DaysoffResponsePriceData[];
 
-  return [];
+  // Prepare
+  // Calculdate 2 years from now
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  const end = new Date();
+  end.setFullYear(start.getFullYear() + 2);
+
+  const sortedDateData = dateData
+    .slice()
+    .sort((a, b) => (a.time_from < b.time_from ? -1 : 1));
+  const boundedDateData: DaysoffResponseDateData[] = [
+    { time_from: "2000-01-01", time_to: start.toISOString(), type: "blocked" },
+    ...sortedDateData,
+    { time_from: end.toISOString(), time_to: "9999-01-01", type: "blocked" },
+  ];
+
+  const result: AvailableBookingPeriod[] = [];
+  let current = start;
+  for (const x of boundedDateData) {
+    const blockedFrom = new Date(x.time_from);
+    const blockedTo = new Date(x.time_to);
+    if (current > blockedTo) continue;
+    if (current < blockedFrom) {
+      result.push({
+        from: current,
+        to: blockedFrom,
+        price: [],
+      });
+    }
+
+    current = blockedTo;
+  }
+
+  return result;
 };
 
 // Response
