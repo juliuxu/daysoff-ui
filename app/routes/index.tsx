@@ -2,8 +2,8 @@ import { Form, useLoaderData, useSubmit } from "@remix-run/react";
 import { z } from "zod";
 
 import {
-  cabinProperties,
-  CabinProperty,
+  cabinFeatures,
+  CabinFeature,
   fixDatesInline,
   isAvailableForPeriod,
 } from "~/domain";
@@ -24,7 +24,7 @@ const dateRangeSchema = z.preprocess((arg) => {
 
 const formSchema = z.object({
   category: z.nativeEnum(Category),
-  properties: z.array(z.nativeEnum(CabinProperty)).default([]),
+  features: z.array(z.nativeEnum(CabinFeature)).default([]),
   dates: z.array(dateRangeSchema).default([]),
 });
 
@@ -34,7 +34,7 @@ export const loader = async ({ context, request }: LoaderArgs) => {
 
   const input = formSchema.parse({
     ...Object.fromEntries(searchParams),
-    properties: searchParams.getAll("properties"),
+    features: searchParams.getAll("features"),
     dates: searchParams.getAll("dates"),
   });
 
@@ -58,12 +58,10 @@ export const loader = async ({ context, request }: LoaderArgs) => {
       (cabin) => input.dates.length === 0 || availableCabins.has(cabin.link),
     )
 
-    // Filter by properties
-    .filter((cabin) =>
-      input.properties.every((p) => cabinProperties[p](cabin)),
-    );
+    // Filter by features
+    .filter((cabin) => input.features.every((p) => cabinFeatures[p](cabin)));
 
-  return json({ cabins: filteredCabins, input });
+  return json({ cabins: filteredCabins, byAvailableDates, input });
 };
 
 export default function Index() {
@@ -104,15 +102,15 @@ export default function Index() {
               <legend>
                 <strong>Filtrer hytter</strong>
               </legend>
-              {(Object.values(CabinProperty) as CabinProperty[]).map((x) => (
+              {(Object.values(CabinFeature) as CabinFeature[]).map((x) => (
                 <label key={x}>
                   <input
                     type="checkbox"
-                    name="properties"
+                    name="features"
                     value={x}
-                    defaultChecked={data.input.properties?.includes(x)}
+                    defaultChecked={data.input.features?.includes(x)}
                   />
-                  {CabinPropertyTitles[x]}
+                  {CabinFeatureTitles[x]}
                 </label>
               ))}
             </fieldset>
@@ -135,9 +133,9 @@ const CategoryTitles: Record<Category, React.ReactNode> = {
   [Category.Ocean]: "Sjøen 🌊",
   [Category.Abroad]: "Utlandet ☀️",
 };
-const CabinPropertyTitles: Record<CabinProperty, React.ReactNode> = {
-  [CabinProperty.Dogs]: "Hunder 🐶",
-  [CabinProperty.Sauna]: "Badstue 🧖",
-  [CabinProperty.Hottub]: "Boblebad ♨️",
-  [CabinProperty.Internet]: "Internett 🌐",
+const CabinFeatureTitles: Record<CabinFeature, React.ReactNode> = {
+  [CabinFeature.Dogs]: "Hunder 🐶",
+  [CabinFeature.Sauna]: "Badstue 🧖",
+  [CabinFeature.Hottub]: "Boblebad ♨️",
+  [CabinFeature.Internet]: "Internett 🌐",
 };

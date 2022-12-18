@@ -87,13 +87,6 @@ export const fixDatesInline = (cabinsRaw: SerializeFrom<Cabin[]>) => {
   return cabinsRaw as any as Cabin[];
 };
 
-export enum CabinProperty {
-  Dogs = "dogs",
-  Sauna = "sauna",
-  Hottub = "hottub",
-  Internet = "internet",
-}
-
 // Domain functions
 export const isAvailableForPeriod = (
   cabin: Cabin,
@@ -110,35 +103,59 @@ export const allowsDogs = (cabin: Cabin) =>
 
 export const hasSauna = (cabin: Cabin) => cabin.facilities.includes("Badstue");
 
-export const cabinProperties: Record<CabinProperty, (cabin: Cabin) => boolean> =
-  {
-    [CabinProperty.Dogs]: (cabin) =>
-      cabin.rules.Husregler?.includes("Tillat med husdyr") &&
-      !cabin.rules.Husregler?.includes("Ikke tillat med husdyr"),
-    [CabinProperty.Sauna]: (cabin) => cabin.facilities.includes("Badstue"),
-    [CabinProperty.Hottub]: (cabin) => cabin.facilities.includes("Boblebad"),
-    [CabinProperty.Internet]: (cabin) => cabin.facilities.includes("Internett"),
-  };
+export enum CabinFeature {
+  Dogs = "dogs",
+  Sauna = "sauna",
+  Hottub = "hottub",
+  Internet = "internet",
+}
+export const cabinFeatures: Record<CabinFeature, (cabin: Cabin) => boolean> = {
+  [CabinFeature.Dogs]: (cabin) =>
+    cabin.rules.Husregler?.includes("Tillat med husdyr") &&
+    !cabin.rules.Husregler?.includes("Ikke tillat med husdyr"),
+  [CabinFeature.Sauna]: (cabin) => cabin.facilities.includes("Badstue"),
+  [CabinFeature.Hottub]: (cabin) => cabin.facilities.includes("Boblebad"),
+  [CabinFeature.Internet]: (cabin) => cabin.facilities.includes("Internett"),
+};
 
-export const preparedCabin = (cabin: Cabin) => ({
-  ...cabin,
+export enum CabinAttribute {
+  Title = "title",
+  LocationName = "location-name",
+  Bedrooms = "bedrooms",
+}
+export const cabinAttributes = {
+  [CabinAttribute.Title]: (cabin) => cabin.title,
+  [CabinAttribute.LocationName]: (cabin) => cabin.specifications.Beliggenhet,
+  [CabinAttribute.Bedrooms]: (cabin) => Number(cabin.specifications.Soverom),
+} satisfies Record<CabinAttribute, (cabin: Cabin) => any>;
 
-  get locationName() {
-    return cabin.specifications.Beliggenhet;
-  },
-  get allowsDogs() {
-    return allowsDogs(cabin);
-  },
-  get hasInternet() {
-    return cabin.facilities.includes("Internett");
-  },
-  get hasSauna() {
-    return hasSauna(cabin);
-  },
-  get hasHottub() {
-    return cabin.facilities.includes("Boblebad");
-  },
-  get bedrooms() {
-    return Number(cabin.specifications.Soverom);
-  },
-});
+export const cabinProperties = {
+  ...cabinFeatures,
+  ...cabinAttributes,
+} as const;
+
+export const cabinPropertyTitles: Record<CabinFeature, string> &
+  Record<CabinAttribute, string> = {
+  [CabinAttribute.Title]: "Tittel",
+  [CabinAttribute.LocationName]: "Lokasjon",
+  [CabinAttribute.Bedrooms]: "Soverom 🛏",
+  [CabinFeature.Dogs]: "Hunder 🐶",
+  [CabinFeature.Sauna]: "Badstue 🧖",
+  [CabinFeature.Hottub]: "Boblebad ♨️",
+  [CabinFeature.Internet]: "Internett 🌐",
+};
+export const cabinPropertyValues: Record<
+  CabinFeature,
+  (cabin: Cabin) => string | number
+> &
+  Record<CabinAttribute, (cabin: Cabin) => string | number> = {
+  ...cabinAttributes,
+  [CabinFeature.Dogs]: (cabin) =>
+    cabinFeatures[CabinFeature.Dogs](cabin) ? "🐶" : "-",
+  [CabinFeature.Sauna]: (cabin) =>
+    cabinFeatures[CabinFeature.Sauna](cabin) ? "🧖" : "-",
+  [CabinFeature.Hottub]: (cabin) =>
+    cabinFeatures[CabinFeature.Hottub](cabin) ? "♨️" : "-",
+  [CabinFeature.Internet]: (cabin) =>
+    cabinFeatures[CabinFeature.Internet](cabin) ? "🌐" : "-",
+};

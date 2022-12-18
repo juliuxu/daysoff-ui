@@ -1,21 +1,26 @@
 import React from "react";
 import { config } from "~/config";
 import type { Cabin } from "~/domain";
-import { preparedCabin } from "~/domain";
+import { CabinAttribute } from "~/domain";
+import { cabinProperties } from "~/domain";
+import { cabinPropertyTitles } from "~/domain";
 
+type SortKey = keyof typeof cabinProperties;
+interface SortState {
+  name: SortKey;
+  dir: "🔼" | "🔽" | "";
+}
 interface CabinsTableProps {
   cabins: Cabin[];
 }
+
 export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
-  interface SortState {
-    name: string;
-    dir: "🔼" | "🔽" | "";
-  }
+  const cabins = cabinsRaw.slice();
   const [sortState, setSortState] = React.useState<SortState>({
-    name: "Lokasjon",
+    name: CabinAttribute.LocationName,
     dir: "",
   });
-  const toggleSortState = (name: string) =>
+  const toggleSortState = (name: SortKey) =>
     setSortState((current) => {
       if (name !== current.name) return { name, dir: "🔼" };
       else if (current.dir === "") return { name, dir: "🔼" };
@@ -23,17 +28,8 @@ export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
       else return { name, dir: "🔼" };
     });
 
-  const cabins = cabinsRaw.map(preparedCabin);
   if (sortState.dir !== "") {
-    const x = (cabin: any) => {
-      if (sortState.name === "Lokasjon") return cabin.locationName;
-      if (sortState.name === "Soverom") return cabin.bedrooms;
-      if (sortState.name === "Hunder") return cabin.allowsDogs;
-      if (sortState.name === "Internett") return cabin.hasInternet;
-      if (sortState.name === "Badstue") return cabin.hasSauna;
-      if (sortState.name === "Boblebad") return cabin.hasHottub;
-      throw new Error(`unhandled sort ${sortState.name}`);
-    };
+    const x = (cabin: Cabin) => cabinProperties[sortState.name](cabin);
     cabins.sort((a, b) => {
       if (x(a) < x(b)) {
         return sortState.dir === "🔼" ? -1 : 1;
@@ -45,47 +41,45 @@ export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
     });
   }
 
-  const Th = (name: string) => (
-    <th scope="col" onClick={() => toggleSortState(name)}>
-      {name} {name === sortState.name && sortState.dir}
-    </th>
-  );
   return (
-    <figure>
-      <table>
-        <thead>
-          <tr>
-            {Th("Tittel")}
-            {Th("Lokasjon")}
-            {Th("Soverom")}
-            {Th("Hunder")}
-            {Th("Internett")}
-            {Th("Badstue")}
-            {Th("Boblebad")}
-          </tr>
-        </thead>
-        <tbody>
-          {cabins.map((cabin) => (
-            <tr key={cabin.link}>
-              <td>{cabin.title}</td>
-              <td>
-                <a
-                  href={`${config.DAYSOFF_BASEURL}${cabin.link}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {cabin.locationName} ↗
-                </a>
-              </td>
-              <td>{cabin.bedrooms}</td>
-              <td>{cabin.allowsDogs ? "🐶" : "-"}</td>
-              <td>{cabin.hasInternet ? "🌐" : "-"}</td>
-              <td>{cabin.hasSauna ? "🧖" : "-"}</td>
-              <td>{cabin.hasHottub ? "♨️" : "-"}</td>
-            </tr>
+    <table>
+      <thead>
+        <tr>
+          {Object.entries(cabinPropertyTitles).map(([key, title]) => (
+            <th
+              key={title}
+              scope="col"
+              onClick={() => toggleSortState(key as SortKey)}
+            >
+              {title} {key === sortState.name && sortState.dir}
+            </th>
           ))}
-        </tbody>
-      </table>
-    </figure>
+        </tr>
+      </thead>
+      <tbody>
+        {cabins.map((cabin) => (
+          <tr key={cabin.link}>
+            {Object.keys(cabinPropertyTitles).map((key) => {
+              if (key === CabinAttribute.LocationName) {
+                return (
+                  <td key={key}>
+                    <a
+                      href={`${config.DAYSOFF_BASEURL}${cabin.link}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {cabinProperties[key as SortKey](cabin)}
+                    </a>
+                  </td>
+                );
+              }
+              return (
+                <td key={key}>{cabinProperties[key as SortKey](cabin)}</td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
