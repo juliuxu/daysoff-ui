@@ -1,24 +1,45 @@
-import { useLoaderData } from "@remix-run/react";
-import { fixDatesInline } from "~/domain";
+import { Form, useLoaderData, useSubmit } from "@remix-run/react";
+import { z } from "zod";
+
+import { cabinProperties, CabinProperty, fixDatesInline } from "~/domain";
 import { allowsDogs, Category } from "~/domain";
 
 import { CabinTable } from "~/components/cabin-table";
 import type { LoaderArgs } from "@remix-run/cloudflare";
+import { redirect } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { CachedDaysoffApi } from "~/service/daysoff/cf-cached-api";
+import React from "react";
 
-export const loader = async ({ context }: LoaderArgs) => {
-  const mountainCabins = await new CachedDaysoffApi(
-    context,
-    {},
-  ).fetchCabinsForCategory(Category.Mountain);
+const formSchema = z.object({
+  category: z.nativeEnum(Category),
+  properties: z.array(z.nativeEnum(CabinProperty)).default([]),
+});
 
-  return json(mountainCabins);
+export const loader = async ({ context, request }: LoaderArgs) => {
+  const searchParams = new URL(request.url).searchParams;
+  if (!searchParams.has("category")) return redirect("/?category=1");
+
+  const input = formSchema.parse({
+    ...Object.fromEntries(searchParams),
+    properties: searchParams.getAll("properties"),
+  });
+
+  const cabins = await new CachedDaysoffApi(context, {}).fetchCabinsForCategory(
+    input.category,
+  );
+
+  const filteredCabins = cabins.filter((cabin) =>
+    input.properties.every((p) => cabinProperties[p](cabin)),
+  );
+
+  return json({ cabins: filteredCabins, input });
 };
 
 export default function Index() {
-  const rawCabins = useLoaderData<typeof loader>();
-  const cabins = fixDatesInline(rawCabins);
+  const data = useLoaderData<typeof loader>();
+  const cabins = fixDatesInline(data.cabins);
+  const submit = useSubmit();
 
   return (
     <>
@@ -27,27 +48,45 @@ export default function Index() {
       </header>
       <main>
         <section>
-          <fieldset onChange={(e) => console.log({ e: e.target })}>
-            <legend>
-              <strong>Filtrer hytter</strong>
-            </legend>
-            <label>
-              <input role="switch" type="checkbox" name="allowDogs" />
-              Hunder 🐶
-            </label>
-            <label>
-              <input role="switch" type="checkbox" name="hasInternet" />
-              Internett 🌐
-            </label>
-            <label>
-              <input role="switch" type="checkbox" name="hasSauna" />
-              Badstue 🧖
-            </label>
-            <label>
-              <input role="switch" type="checkbox" name="hasHottub" />
-              Boblebad ♨️
-            </label>
-          </fieldset>
+          <Form
+            onChange={(e) => {
+              submit(e.currentTarget);
+            }}
+          >
+            <fieldset>
+              <legend>
+                <strong>Kategori</strong>
+                {(Object.values(Category) as Category[]).map((x) => (
+                  <label key={x}>
+                    <input
+                      type="radio"
+                      name="category"
+                      value={x}
+                      defaultChecked={data.input.category === x}
+                    />
+                    {CategoryTitles[x]}
+                  </label>
+                ))}
+              </legend>
+            </fieldset>
+
+            <fieldset>
+              <legend>
+                <strong>Filtrer hytter</strong>
+              </legend>
+              {(Object.values(CabinProperty) as CabinProperty[]).map((x) => (
+                <label key={x}>
+                  <input
+                    type="checkbox"
+                    name="properties"
+                    value={x}
+                    defaultChecked={data.input.properties?.includes(x)}
+                  />
+                  {CabinPropertyTitles[x]}
+                </label>
+              ))}
+            </fieldset>
+          </Form>
         </section>
         Count: {cabins.length}
         <br />
@@ -61,3 +100,15 @@ export default function Index() {
     </>
   );
 }
+
+const CategoryTitles: Record<Category, React.ReactNode> = {
+  [Category.Mountain]: "Fjellet 🗻",
+  [Category.Ocean]: "Ved sjøen 🌊",
+  [Category.Abroad]: "Utlandet ☀️",
+};
+const CabinPropertyTitles: Record<CabinProperty, React.ReactNode> = {
+  [CabinProperty.Dogs]: "Hunder 🐶",
+  [CabinProperty.Sauna]: "Badstue 🧖",
+  [CabinProperty.Hottub]: "Boblebad ♨️",
+  [CabinProperty.Internet]: "Internett 🌐",
+};

@@ -6,9 +6,9 @@ export interface LatLng {
   lng: string;
 }
 export enum Category {
-  Mountain = 1,
-  Ocean = 2,
-  Abroad = 3,
+  Mountain = "1",
+  Ocean = "2",
+  Abroad = "3",
 }
 
 export interface CabinShallow {
@@ -87,12 +87,29 @@ export const fixDatesInline = (cabinsRaw: SerializeFrom<Cabin[]>) => {
   return cabinsRaw as any as Cabin[];
 };
 
+export enum CabinProperty {
+  Dogs = "dogs",
+  Sauna = "sauna",
+  Hottub = "hottub",
+  Internet = "internet",
+}
+
 // Domain functions
 export const allowsDogs = (cabin: Cabin) =>
   cabin.rules.Husregler?.includes("Tillat med husdyr") &&
   !cabin.rules.Husregler?.includes("Ikke tillat med husdyr");
 
 export const hasSauna = (cabin: Cabin) => cabin.facilities.includes("Badstue");
+
+export const cabinProperties: Record<CabinProperty, (cabin: Cabin) => boolean> =
+  {
+    [CabinProperty.Dogs]: (cabin) =>
+      cabin.rules.Husregler?.includes("Tillat med husdyr") &&
+      !cabin.rules.Husregler?.includes("Ikke tillat med husdyr"),
+    [CabinProperty.Sauna]: (cabin) => cabin.facilities.includes("Badstue"),
+    [CabinProperty.Hottub]: (cabin) => cabin.facilities.includes("Boblebad"),
+    [CabinProperty.Internet]: (cabin) => cabin.facilities.includes("Internett"),
+  };
 
 export const preparedCabin = (cabin: Cabin) => ({
   ...cabin,
