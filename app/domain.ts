@@ -56,13 +56,11 @@ export type PriceData = PriceMap & {
 };
 
 const getPriceForDay = (cabin: Cabin, date: Date) => {
-  // FIrst check special price
-
-  // TODO
-  // const specialPricePeriod = cabin.priceData.specialPricePeriods.find(
-  //   (x) => x.from >= date && date <= x.to,
-  // );
-  // if (specialPricePeriod) return specialPricePeriod.price;
+  // First check special price
+  const specialPricePeriod = cabin.priceData.specialPricePeriods.find(
+    (x) => x.from <= date && date <= x.to,
+  );
+  if (specialPricePeriod) return specialPricePeriod.price;
 
   const res =
     cabin.priceData[date.getFullYear()]?.[date.getMonth()]?.[date.getDay()];
