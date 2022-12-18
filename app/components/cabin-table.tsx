@@ -25,7 +25,7 @@ export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
     setSortState((current) => {
       if (name !== current.name) return { name, dir: "🔽" };
       else if (current.dir === "") return { name, dir: "🔽" };
-      else if (current.dir === "🔼") return { name, dir: "🔽" };
+      else if (current.dir === "🔼") return { name, dir: "" };
       else return { name, dir: "🔼" };
     });
 

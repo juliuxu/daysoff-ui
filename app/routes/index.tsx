@@ -114,7 +114,11 @@ export default function Index() {
                 </label>
               ))}
             </fieldset>
-            <DaterangeList name="dates" defaultValues={data.input.dates} />
+            <DaterangeList
+              name="dates"
+              defaultValues={data.input.dates}
+              min={new Date().toISOString().split("T")[0]}
+            />
           </Form>
         </section>
         Count: {cabins.length}

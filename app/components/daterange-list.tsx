@@ -9,8 +9,13 @@ type Daterange = [from: string, to: string];
 interface DaterangeListProps {
   name: string;
   defaultValues: Daterange[];
+  min?: string;
 }
-export const DaterangeList = ({ name, defaultValues }: DaterangeListProps) => {
+export const DaterangeList = ({
+  name,
+  defaultValues,
+  min,
+}: DaterangeListProps) => {
   const selectRef = useRef<HTMLSelectElement>(null);
   const [selectedDates, setSelectedDates] = useState(
     () =>
@@ -52,20 +57,21 @@ export const DaterangeList = ({ name, defaultValues }: DaterangeListProps) => {
     setTo("");
   };
 
-  useEffect(() => {
-    if (from && to) {
-      addDateRange();
-      fromRef.current?.blur();
-      toRef.current?.blur();
-    } else if (from) {
-      toRef.current?.focus();
-      setTimeout(() => toRef.current?.showPicker?.(), 100);
-    } else if (to) {
-      fromRef.current?.focus();
-      setTimeout(() => fromRef.current?.showPicker?.(), 100);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [from, to]);
+  // Disabled in favor of manual button
+  // useEffect(() => {
+  //   if (from && to) {
+  //     addDateRange();
+  //     fromRef.current?.blur();
+  //     toRef.current?.blur();
+  //   } else if (from) {
+  //     toRef.current?.focus();
+  //     setTimeout(() => toRef.current?.showPicker?.(), 100);
+  //   } else if (to) {
+  //     fromRef.current?.focus();
+  //     setTimeout(() => fromRef.current?.showPicker?.(), 100);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [from, to]);
 
   return (
     <>
@@ -107,6 +113,7 @@ export const DaterangeList = ({ name, defaultValues }: DaterangeListProps) => {
             ref={fromRef}
             type="date"
             value={from}
+            min={min}
             max={to}
             onChange={(e) => {
               e.stopPropagation();
@@ -127,6 +134,10 @@ export const DaterangeList = ({ name, defaultValues }: DaterangeListProps) => {
             }}
           />
         </label>
+
+        <button disabled={!to || !from} onClick={() => addDateRange()}>
+          Legg til
+        </button>
       </div>
     </>
   );
