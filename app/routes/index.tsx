@@ -41,9 +41,14 @@ export const loader = async ({ context, request }: LoaderArgs) => {
     dates: searchParams.getAll("dates"),
   });
 
-  const cabins = await new CachedDaysoffApi(context, {}).fetchCabinsForCategory(
+  let cabins = await new CachedDaysoffApi(context, {}).fetchCabinsForCategory(
     input.category,
   );
+
+  cabins = cabins
+
+    // Filter by features
+    .filter((cabin) => input.features.every((p) => cabinFeatures[p](cabin)));
 
   // Selected date ranges
   const byAvailableDates = input.dates.map((daterange) => ({
@@ -54,17 +59,13 @@ export const loader = async ({ context, request }: LoaderArgs) => {
     byAvailableDates.flatMap((x) => x.cabins).map((x) => x.link),
   );
 
-  const filteredCabins = cabins
-
+  cabins = cabins
     // Filter by available
     .filter(
       (cabin) => input.dates.length === 0 || availableCabins.has(cabin.link),
-    )
+    );
 
-    // Filter by features
-    .filter((cabin) => input.features.every((p) => cabinFeatures[p](cabin)));
-
-  return json({ cabins: filteredCabins, byAvailableDates, input });
+  return json({ cabins, byAvailableDates, input });
 };
 
 export default function Index() {
