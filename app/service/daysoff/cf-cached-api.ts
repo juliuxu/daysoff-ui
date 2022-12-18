@@ -1,6 +1,7 @@
 import type { AppLoadContext } from "@remix-run/cloudflare";
 import { config } from "~/config";
 import type { Cabin, CabinShallow, Category } from "~/domain";
+import { fixDatesInline } from "~/domain";
 import { getAuth } from "~/utils/env";
 import { chunked } from "~/utils/misc";
 import {
@@ -80,8 +81,8 @@ export class CachedDaysoffApi {
         ),
     );
 
-  fetchCabinsForCategory = (category: Category) =>
-    kvCachedRequest(
+  fetchCabinsForCategory = async (category: Category) => {
+    const response = await kvCachedRequest(
       this.#kv,
       `fetchCabinsForCategory-${category}`,
       this.#cacheOptions,
@@ -98,4 +99,7 @@ export class CachedDaysoffApi {
         return cabins;
       },
     );
+    fixDatesInline(response as any);
+    return response;
+  };
 }

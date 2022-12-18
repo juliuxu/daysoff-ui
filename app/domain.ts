@@ -54,23 +54,23 @@ export type PriceData = PriceMap & {
 };
 
 // Fix Date
-export const fixDates = (cabinsRaw: SerializeFrom<Cabin[]>) =>
-  cabinsRaw.map<Cabin>((cabin) => ({
-    ...cabin,
-    availableBookingPeriods: cabin.availableBookingPeriods.map((x) => ({
-      ...x,
-      from: new Date(x.from),
-      to: new Date(x.to),
-    })),
-    priceData: {
-      ...cabin.priceData,
-      specialPricePeriods: cabin.priceData.specialPricePeriods.map((x) => ({
-        ...x,
-        from: new Date(x.from),
-        to: new Date(x.to),
-      })),
-    },
-  }));
+// export const fixDates = (cabinsRaw: SerializeFrom<Cabin[]>) =>
+//   cabinsRaw.map<Cabin>((cabin) => ({
+//     ...cabin,
+//     availableBookingPeriods: cabin.availableBookingPeriods.map((x) => ({
+//       ...x,
+//       from: new Date(x.from),
+//       to: new Date(x.to),
+//     })),
+//     priceData: {
+//       ...cabin.priceData,
+//       specialPricePeriods: cabin.priceData.specialPricePeriods.map((x) => ({
+//         ...x,
+//         from: new Date(x.from),
+//         to: new Date(x.to),
+//       })),
+//     },
+//   }));
 
 // TODO: Test out performance
 export const fixDatesInline = (cabinsRaw: SerializeFrom<Cabin[]>) => {

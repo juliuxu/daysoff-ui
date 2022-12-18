@@ -1,6 +1,5 @@
 import { useLoaderData } from "@remix-run/react";
-import type { Cabin } from "~/domain";
-import { fixDates } from "~/domain";
+import { fixDatesInline } from "~/domain";
 import { allowsDogs, Category } from "~/domain";
 
 import { CabinTable } from "~/components/cabin-table";
@@ -19,7 +18,7 @@ export const loader = async ({ context }: LoaderArgs) => {
 
 export default function Index() {
   const rawCabins = useLoaderData<typeof loader>();
-  const cabins = fixDates(rawCabins);
+  const cabins = fixDatesInline(rawCabins);
 
   return (
     <>
