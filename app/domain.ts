@@ -55,6 +55,7 @@ export type PriceData = PriceMap & {
   specialPricePeriods: SpecialPricePeriod[];
 };
 
+// TODO: Bug, http://127.0.0.1:8788/?category=1&features=dogs&features=sauna&dates=2023-01-06%3A2023-01-08
 const getPriceForDay = (cabin: Cabin, date: Date) => {
   // First check special price
   const specialPricePeriod = cabin.priceData.specialPricePeriods.find(
