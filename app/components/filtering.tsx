@@ -77,7 +77,7 @@ export const Filtering = () => {
         {filters.map((section, sectionIdx) => (
           <div
             key={sectionIdx}
-            className={sectionIdx === 0 ? undefined : "pt-10"}
+            className={sectionIdx === 0 ? undefined : "pt-4"}
           >
             <fieldset>
               <legend className="block text-sm font-medium text-gray-900">
@@ -92,7 +92,7 @@ export const Filtering = () => {
                       value={option.value}
                       defaultChecked={option.defaultChecked}
                       type={section.type}
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
                     <label
                       htmlFor={`${section.id}-${optionIdx}`}
@@ -108,13 +108,19 @@ export const Filtering = () => {
         ))}
 
         {/* Attributes */}
-        <div className="pt-10">
+        <div className="pt-4">
           <fieldset>
             <legend className="block text-sm font-medium text-gray-900">
               Attributter
             </legend>
             <div className="space-y-3 pt-6">
-              <div className="flex items-center">
+              <div className="">
+                <label
+                  htmlFor={`attributes-${CabinAttribute.Title}`}
+                  className="block text-sm font-medium text-gray-600"
+                >
+                  {cabinPropertyTitles[CabinAttribute.Title]}
+                </label>
                 <input
                   id={`attributes-${CabinAttribute.Title}`}
                   name={`attributes-${CabinAttribute.Title}`}
@@ -126,14 +132,14 @@ export const Filtering = () => {
                   type="search"
                   className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
-                <label
-                  htmlFor={`attributes-${CabinAttribute.Title}`}
-                  className="ml-3 text-sm text-gray-600"
-                >
-                  {cabinPropertyTitles[CabinAttribute.Title]}
-                </label>
               </div>
-              <div className="flex items-center">
+              <div className="">
+                <label
+                  htmlFor={`attributes-${CabinAttribute.Location}`}
+                  className="block text-sm font-medium text-gray-600"
+                >
+                  {cabinPropertyTitles[CabinAttribute.Location]}
+                </label>
                 <input
                   id={`attributes-${CabinAttribute.Location}`}
                   name={`attributes-${CabinAttribute.Location}`}
@@ -145,14 +151,14 @@ export const Filtering = () => {
                   type="search"
                   className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
-                <label
-                  htmlFor={`attributes-${CabinAttribute.Location}`}
-                  className="ml-3 text-sm text-gray-600"
-                >
-                  {cabinPropertyTitles[CabinAttribute.Location]}
-                </label>
               </div>
-              <div className="flex items-center">
+              <div className="">
+                <label
+                  htmlFor={`attributes-${CabinAttribute.Bedrooms}`}
+                  className="block text-sm font-medium text-gray-600"
+                >
+                  {cabinPropertyTitles[CabinAttribute.Bedrooms]}
+                </label>
                 <input
                   id={`attributes-${CabinAttribute.Bedrooms}`}
                   name={`attributes-${CabinAttribute.Bedrooms}`}
@@ -166,14 +172,14 @@ export const Filtering = () => {
                   min={1}
                   className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
-                <label
-                  htmlFor={`attributes-${CabinAttribute.Bedrooms}`}
-                  className="ml-3 text-sm text-gray-600"
-                >
-                  {cabinPropertyTitles[CabinAttribute.Bedrooms]}
-                </label>
               </div>
-              <div className="flex items-center">
+              <div className="">
+                <label
+                  htmlFor={`attributes-${CabinAttribute.Beds}`}
+                  className="block text-sm font-medium text-gray-600"
+                >
+                  {cabinPropertyTitles[CabinAttribute.Beds]}
+                </label>
                 <input
                   id={`attributes-${CabinAttribute.Beds}`}
                   name={`attributes-${CabinAttribute.Beds}`}
@@ -187,19 +193,13 @@ export const Filtering = () => {
                   min={1}
                   className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
-                <label
-                  htmlFor={`attributes-${CabinAttribute.Beds}`}
-                  className="ml-3 text-sm text-gray-600"
-                >
-                  {cabinPropertyTitles[CabinAttribute.Beds]}
-                </label>
               </div>
             </div>
           </fieldset>
         </div>
 
         {/* Dates */}
-        <div className="pt-10">
+        <div className="pt-4">
           <fieldset>
             <legend className="block text-sm font-medium text-gray-900">
               Datoer
