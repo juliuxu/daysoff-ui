@@ -74,7 +74,7 @@ export const DaterangeList = ({
   const id = useId();
   return (
     <>
-      <ul className="flex flex-wrap gap-1 py-2 px-1">
+      <ul className="flex flex-wrap gap-1">
         {selectedDates.map((v) => (
           <span
             key={daterangeId(v)}
@@ -122,15 +122,19 @@ export const DaterangeList = ({
         ))}
       </select>
 
-      <div>
-        <label>
-          Fra
+      <div className="flex items-end gap-2">
+        <div>
+          <label
+            htmlFor={`${id}-from`}
+            className="block text-sm font-medium text-gray-600"
+          >
+            Fra
+          </label>
           <input
-            id={id + "-from"}
+            id={`${id}-from`}
             ref={fromRef}
             type="date"
             value={from}
-            min={min}
             max={to}
             onChange={(e) => {
               e.stopPropagation();
@@ -138,11 +142,16 @@ export const DaterangeList = ({
             }}
             className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
-        </label>
-        <label>
-          Til
+        </div>
+        <div>
+          <label
+            htmlFor={`${id}-to`}
+            className="block text-sm font-medium text-gray-600"
+          >
+            Til
+          </label>
           <input
-            id={id + "-to"}
+            id={`${id}-to`}
             ref={toRef}
             type="date"
             value={to}
@@ -153,12 +162,15 @@ export const DaterangeList = ({
             }}
             className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
-        </label>
-
-        <button disabled={!to || !from} onClick={() => addDateRange()}>
-          Legg til
-        </button>
+        </div>
       </div>
+      <button
+        className="inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:text-gray-300 disabled:hover:bg-inherit"
+        disabled={!to || !from}
+        onClick={() => addDateRange()}
+      >
+        Legg til
+      </button>
     </>
   );
 };
