@@ -95,7 +95,7 @@ export const fixDatesInline = (cabinsRaw: SerializeFrom<Cabin[]>) => {
   return cabinsRaw as any as Cabin[];
 };
 
-// If a day price is 0, or does not exists, it is not a valid date that can't be booked
+// Some valid cabins might be 0 in price, but if the price is not given, then it's not available
 // the getPriceForDay returns a big negative number when that happens
 const isValidAvailabilityBasedOnPrice = (
   cabin: Cabin,
@@ -104,7 +104,7 @@ const isValidAvailabilityBasedOnPrice = (
   datesBetween(datePeriod)
     .slice(0, -1)
     .map((x) => getPriceForDay(cabin, x))
-    .reduce((acc, x) => acc + x, 0) > 0;
+    .reduce((acc, x) => acc + x, 0) >= 0;
 
 export const isAvailableForPeriod = (
   cabin: Cabin,
