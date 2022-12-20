@@ -330,6 +330,7 @@ const Filtering = () => {
                     )?.[1]
                   }
                   type="number"
+                  inputMode="numeric"
                   min={1}
                   className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
@@ -350,6 +351,7 @@ const Filtering = () => {
                     )?.[1]
                   }
                   type="number"
+                  inputMode="numeric"
                   min={1}
                   className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 />
