@@ -37,3 +37,6 @@ const formatter = new Intl.DateTimeFormat("no-nb", { dateStyle: "full" });
 export const daterangeId = ([from, to]: Daterange) => `${from}:${to}`;
 export const daterangeFormat = ([from, to]: Daterange) =>
   formatter.formatRange(new Date(from), new Date(to));
+
+export const dateToYearMonthDay = (date: Date | string) =>
+  new Date(date).toISOString().split("T")[0];

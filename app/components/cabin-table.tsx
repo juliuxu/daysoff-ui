@@ -18,7 +18,7 @@ interface CabinsTableProps {
 export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
   const cabins = cabinsRaw.slice();
   const [sortState, setSortState] = React.useState<SortState>({
-    name: CabinAttribute.LocationName,
+    name: CabinAttribute.Location,
     dir: "",
   });
   const toggleSortState = (name: SortKey) =>
@@ -50,6 +50,8 @@ export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
             <th
               key={title}
               scope="col"
+              // TODO: Make accessible
+              className="cursor-pointer"
               onClick={() => toggleSortState(key as SortKey)}
             >
               {title} {key === sortState.name && sortState.dir}
@@ -61,7 +63,7 @@ export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
         {cabins.map((cabin) => (
           <tr key={cabin.link}>
             {Object.keys(cabinPropertyTitles).map((key) => {
-              if (key === CabinAttribute.LocationName) {
+              if (key === CabinAttribute.Location) {
                 return (
                   <td key={key}>
                     <a

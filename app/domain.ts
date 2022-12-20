@@ -139,13 +139,15 @@ export const cabinFeatures: Record<CabinFeature, (cabin: Cabin) => boolean> = {
 
 export enum CabinAttribute {
   Title = "title",
-  LocationName = "location-name",
+  Location = "location",
   Bedrooms = "bedrooms",
+  Beds = "beds",
 }
 export const cabinAttributes = {
   [CabinAttribute.Title]: (cabin) => cabin.title,
-  [CabinAttribute.LocationName]: (cabin) => cabin.specifications.Beliggenhet,
+  [CabinAttribute.Location]: (cabin) => cabin.specifications.Beliggenhet,
   [CabinAttribute.Bedrooms]: (cabin) => Number(cabin.specifications.Soverom),
+  [CabinAttribute.Beds]: (cabin) => Number(cabin.specifications.Sengeplasser),
 } satisfies Record<CabinAttribute, (cabin: Cabin) => any>;
 
 export const cabinProperties = {
@@ -156,8 +158,9 @@ export const cabinProperties = {
 export const cabinPropertyTitles: Record<CabinFeature, string> &
   Record<CabinAttribute, string> = {
   [CabinAttribute.Title]: "Tittel",
-  [CabinAttribute.LocationName]: "Lokasjon",
-  [CabinAttribute.Bedrooms]: "Soverom 🛏",
+  [CabinAttribute.Location]: "Lokasjon",
+  [CabinAttribute.Bedrooms]: "Soverom 🚪",
+  [CabinAttribute.Beds]: "Sengeplasser 🛏",
   [CabinFeature.Dogs]: "Hunder 🐶",
   [CabinFeature.Sauna]: "Badstue 🧖",
   [CabinFeature.Hottub]: "Boblebad ♨️",
@@ -177,4 +180,10 @@ export const cabinPropertyValues: Record<
     cabinFeatures[CabinFeature.Hottub](cabin) ? "♨️" : "-",
   [CabinFeature.Internet]: (cabin) =>
     cabinFeatures[CabinFeature.Internet](cabin) ? "🌐" : "-",
+};
+
+export const cabinCategoryTitles: Record<Category, React.ReactNode> = {
+  [Category.Mountain]: "Fjellet 🗻",
+  [Category.Ocean]: "Sjøen 🌊",
+  [Category.Abroad]: "Utlandet ☀️",
 };
