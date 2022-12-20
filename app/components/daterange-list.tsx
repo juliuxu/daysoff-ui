@@ -139,6 +139,7 @@ export const DaterangeList = ({
               e.stopPropagation();
               setFrom(e.currentTarget.value);
             }}
+            className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </label>
         <label>
@@ -153,6 +154,7 @@ export const DaterangeList = ({
               e.stopPropagation();
               setTo(e.currentTarget.value);
             }}
+            className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </label>
 

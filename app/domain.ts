@@ -116,12 +116,6 @@ export const isAvailableForPeriod = (
       availableBookingPeriod.from <= from && to <= availableBookingPeriod.to,
   );
 
-export const allowsDogs = (cabin: Cabin) =>
-  cabin.rules.Husregler?.includes("Tillat med husdyr") &&
-  !cabin.rules.Husregler?.includes("Ikke tillat med husdyr");
-
-export const hasSauna = (cabin: Cabin) => cabin.facilities.includes("Badstue");
-
 export enum CabinFeature {
   Dogs = "dogs",
   Sauna = "sauna",

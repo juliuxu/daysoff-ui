@@ -1,9 +1,6 @@
 import { Form, useLoaderData, useSubmit } from "@remix-run/react";
 import { z } from "zod";
 
-import { XMarkIcon } from "@heroicons/react/24/outline";
-import { ChevronDownIcon, PlusIcon } from "@heroicons/react/20/solid";
-
 import type { Cabin } from "~/domain";
 import {
   CabinAttribute,
@@ -29,6 +26,7 @@ import { CachedDaysoffApi } from "~/service/daysoff/cf-cached-api";
 import { DaterangeList } from "~/components/daterange-list";
 import { daterangeFormat, daterangeId, dateToYearMonthDay } from "~/utils/misc";
 import { config } from "~/config";
+import { CabinLongCardList } from "~/components/cabin-card";
 
 const dateRangeSchema = z.preprocess((arg) => {
   if (typeof arg == "string") {
@@ -149,7 +147,30 @@ export default function Component() {
           <Filtering />
           <div className="mt-6 lg:col-span-2 lg:mt-0 xl:col-span-3">
             {/* Table view */}
-            <CabinTable cabins={cabins} />
+            {/* <CabinTable cabins={cabins} /> */}
+
+            {/* Card view */}
+            {byAvailableDates.length === 0 && (
+              <CabinLongCardList cabins={cabins} />
+            )}
+
+            {/* Card view by availability */}
+            {byAvailableDates.map(
+              ({ cabins: availableCabins, daterange }, i) => (
+                <section key={daterangeId(daterange)}>
+                  <details open={i === 0}>
+                    <summary className="cursor-pointer">
+                      {daterangeFormat(daterange)} - ({availableCabins.length})
+                    </summary>
+                    <div className="mt-6" />
+                    <CabinLongCardList
+                      period={[new Date(daterange[0]), new Date(daterange[1])]}
+                      cabins={availableCabins}
+                    />
+                  </details>
+                </section>
+              ),
+            )}
           </div>
         </div>
       </main>

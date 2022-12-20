@@ -77,7 +77,9 @@ export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
                 );
               }
               return (
-                <td key={key}>{cabinPropertyValues[key as SortKey](cabin)}</td>
+                <td key={key} className="text-ellipsis">
+                  {cabinPropertyValues[key as SortKey](cabin)}
+                </td>
               );
             })}
           </tr>
