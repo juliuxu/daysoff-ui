@@ -205,6 +205,17 @@ const Filtering = () => {
       <h2 className="sr-only">Filters</h2>
 
       <Form
+        // Remove extraneous query params from url
+        ref={(ref) => {
+          ref?.addEventListener("formdata", (e) => {
+            for (const [key, value] of e.formData.entries()) {
+              if (value === "") {
+                console.log(`remove ${key} ${value}`);
+                e.formData.delete(key);
+              }
+            }
+          });
+        }}
         onChange={(e) => {
           submit(e.currentTarget);
         }}
