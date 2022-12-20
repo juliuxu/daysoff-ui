@@ -155,22 +155,32 @@ export default function Component() {
             )}
 
             {/* Card view by availability */}
-            {byAvailableDates.map(
-              ({ cabins: availableCabins, daterange }, i) => (
-                <section key={daterangeId(daterange)}>
-                  <details open={i === 0}>
-                    <summary className="cursor-pointer">
-                      {daterangeFormat(daterange)} - ({availableCabins.length})
-                    </summary>
-                    <div className="mt-6" />
-                    <CabinLongCardList
-                      period={[new Date(daterange[0]), new Date(daterange[1])]}
-                      cabins={availableCabins}
-                    />
-                  </details>
-                </section>
-              ),
-            )}
+            <div className="flex flex-col gap-6">
+              {byAvailableDates.map(
+                ({ cabins: availableCabins, daterange }, i) => (
+                  <section key={daterangeId(daterange)}>
+                    <details open={i === 0}>
+                      <summary className="cursor-pointer ">
+                        <p className="text-lg text-gray-800">
+                          {availableCabins.length} hytter funnet for tidsrom
+                        </p>
+                        <h2 className="text-3xl">
+                          {daterangeFormat(daterange)}
+                        </h2>
+                      </summary>
+                      <div className="mt-6" />
+                      <CabinLongCardList
+                        period={[
+                          new Date(daterange[0]),
+                          new Date(daterange[1]),
+                        ]}
+                        cabins={availableCabins}
+                      />
+                    </details>
+                  </section>
+                ),
+              )}
+            </div>
           </div>
         </div>
       </main>
