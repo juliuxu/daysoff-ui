@@ -123,7 +123,7 @@ export default function Component() {
 
   return (
     <>
-      <main className="mx-auto max-w-2xl py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
+      <main className="mx-auto max-w-2xl py-16 px-4 sm:max-w-4xl sm:py-16 sm:px-4 lg:max-w-7xl lg:px-6">
         <div className="border-b border-gray-200 pb-10">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900">
             Daysoff Søkeui

@@ -42,7 +42,8 @@ const CabinCard = ({ cabin, period }: CabinCardProps) => (
           <>
             {currencyFormatter.format(getPriceForPeriod(cabin, period))}{" "}
             <span className="text-sm text-gray-600">
-              / {datesBetween(period).length - 1} netter
+              / {datesBetween(period).length - 1}{" "}
+              {datesBetween(period).length - 1 === 1 ? "natt" : "netter"}
             </span>
           </>
         )}
