@@ -1,32 +1,23 @@
-import { Form, useLoaderData, useSubmit } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { z } from "zod";
 
-import type { Cabin } from "~/domain";
-import {
-  CabinAttribute,
-  cabinAttributes,
-  cabinCategoryTitles,
-  cabinPropertyTitles,
-  DatePeriod,
-} from "~/domain";
+import type { Cabin, DatePeriod } from "~/domain";
+import { CabinAttribute, cabinAttributes } from "~/domain";
 import {
   cabinFeatures,
   CabinFeature,
   fixDatesInline,
   isAvailableForPeriod,
-  getPriceForPeriod,
 } from "~/domain";
 import { Category } from "~/domain";
 
-import { CabinTable } from "~/components/cabin-table";
 import type { LoaderArgs } from "@remix-run/cloudflare";
 import { redirect } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { CachedDaysoffApi } from "~/service/daysoff/cf-cached-api";
-import { DaterangeList } from "~/components/daterange-list";
-import { daterangeFormat, daterangeId, dateToYearMonthDay } from "~/utils/misc";
-import { config } from "~/config";
-import { CabinLongCardList } from "~/components/cabin-card";
+import { daterangeFormat, daterangeId } from "~/utils/misc";
+import { CabinCardList } from "~/components/cabin-card";
+import { Filtering } from "~/components/filtering";
 
 const dateRangeSchema = z.preprocess((arg) => {
   if (typeof arg == "string") {
@@ -144,36 +135,36 @@ export default function Component() {
         </div>
 
         <div className="pt-12 lg:grid lg:grid-cols-3 lg:gap-x-8 xl:grid-cols-4">
+          {/* Filter */}
           <Filtering />
+
           <div className="mt-6 lg:col-span-2 lg:mt-0 xl:col-span-3">
             {/* Table view */}
             {/* <CabinTable cabins={cabins} /> */}
 
             {/* Card view */}
-            {byAvailableDates.length === 0 && (
-              <CabinLongCardList cabins={cabins} />
-            )}
+            {byAvailableDates.length === 0 && <CabinCardList cabins={cabins} />}
 
             {/* Card view by availability */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-12">
               {byAvailableDates.map(
                 ({ cabins: availableCabins, daterange }, i) => (
                   <section key={daterangeId(daterange)}>
-                    <details open={i === 0}>
-                      <summary className="cursor-pointer ">
-                        <p className="text-lg text-gray-800">
-                          {availableCabins.length} hytter funnet for tidsrom
+                    <details
+                      open={i === 0}
+                      className="[&>summary>h2:before]:content-['►'] [&>summary>h2:before]:open:content-['▼']"
+                    >
+                      <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                        <p className="text-sm font-semibold uppercase tracking-wide text-gray-600">
+                          {availableCabins.length} hytter
                         </p>
-                        <h2 className="text-3xl">
+                        <h2 className="text-3xl hover:underline [&:before]:text-2xl [&:before]:text-gray-600">
                           {daterangeFormat(daterange)}
                         </h2>
                       </summary>
                       <div className="mt-6" />
-                      <CabinLongCardList
-                        period={[
-                          new Date(daterange[0]),
-                          new Date(daterange[1]),
-                        ]}
+                      <CabinCardList
+                        period={daterange.map((x) => new Date(x)) as DatePeriod}
                         cabins={availableCabins}
                       />
                     </details>
@@ -187,221 +178,3 @@ export default function Component() {
     </>
   );
 }
-
-const Filtering = () => {
-  const data = useLoaderData<typeof loader>();
-  const submit = useSubmit();
-
-  type Filter = {
-    id: string;
-    name: React.ReactNode;
-    type: "radio" | "checkbox";
-    options: {
-      value: string;
-      label: React.ReactNode;
-      defaultChecked: boolean;
-    }[];
-  };
-  // | {
-  //     id: string;
-  //     name: React.ReactNode;
-  //     type: "number";
-  //     options: { value: string; label: React.ReactNode }[];
-  //   };
-
-  const filters: Filter[] = [
-    {
-      id: "category",
-      name: "Kategori",
-      type: "radio",
-      options: (Object.values(Category) as Category[]).map((x) => ({
-        value: x,
-        label: cabinCategoryTitles[x],
-        defaultChecked: data.input.category?.includes(x),
-      })),
-    },
-    {
-      id: "features",
-      name: "Egenskaper",
-      type: "checkbox",
-      options: (Object.values(CabinFeature) as CabinFeature[]).map((x) => ({
-        value: x,
-        label: cabinPropertyTitles[x],
-        defaultChecked: data.input.features?.includes(x),
-      })),
-    },
-  ];
-  return (
-    <aside>
-      <h2 className="sr-only">Filters</h2>
-
-      <Form
-        // Remove extraneous query params from url
-        ref={(ref) => {
-          ref?.addEventListener("formdata", (e) => {
-            for (const [key, value] of e.formData.entries()) {
-              if (value === "") {
-                console.log(`remove ${key} ${value}`);
-                e.formData.delete(key);
-              }
-            }
-          });
-        }}
-        onChange={(e) => {
-          submit(e.currentTarget);
-        }}
-        className="space-y-10 divide-y divide-gray-200"
-      >
-        {filters.map((section, sectionIdx) => (
-          <div
-            key={sectionIdx}
-            className={sectionIdx === 0 ? undefined : "pt-10"}
-          >
-            <fieldset>
-              <legend className="block text-sm font-medium text-gray-900">
-                {section.name}
-              </legend>
-              <div className="space-y-3 pt-6">
-                {section.options.map((option, optionIdx) => (
-                  <div key={option.value} className="flex items-center">
-                    <input
-                      id={`${section.id}-${optionIdx}`}
-                      name={`${section.id}`}
-                      value={option.value}
-                      defaultChecked={option.defaultChecked}
-                      type={section.type}
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <label
-                      htmlFor={`${section.id}-${optionIdx}`}
-                      className="ml-3 text-sm text-gray-600"
-                    >
-                      {option.label}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </fieldset>
-          </div>
-        ))}
-
-        {/* Attributes */}
-        <div className="pt-10">
-          <fieldset>
-            <legend className="block text-sm font-medium text-gray-900">
-              Attributter
-            </legend>
-            <div className="space-y-3 pt-6">
-              <div className="flex items-center">
-                <input
-                  id={`attributes-${CabinAttribute.Title}`}
-                  name={`attributes-${CabinAttribute.Title}`}
-                  defaultValue={
-                    data.input.attributes.find(
-                      ([x]) => x === CabinAttribute.Title,
-                    )?.[1]
-                  }
-                  type="search"
-                  className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                />
-                <label
-                  htmlFor={`attributes-${CabinAttribute.Title}`}
-                  className="ml-3 text-sm text-gray-600"
-                >
-                  {cabinPropertyTitles[CabinAttribute.Title]}
-                </label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  id={`attributes-${CabinAttribute.Location}`}
-                  name={`attributes-${CabinAttribute.Location}`}
-                  defaultValue={
-                    data.input.attributes.find(
-                      ([x]) => x === CabinAttribute.Location,
-                    )?.[1]
-                  }
-                  type="search"
-                  className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                />
-                <label
-                  htmlFor={`attributes-${CabinAttribute.Location}`}
-                  className="ml-3 text-sm text-gray-600"
-                >
-                  {cabinPropertyTitles[CabinAttribute.Location]}
-                </label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  id={`attributes-${CabinAttribute.Bedrooms}`}
-                  name={`attributes-${CabinAttribute.Bedrooms}`}
-                  defaultValue={
-                    data.input.attributes.find(
-                      ([x]) => x === CabinAttribute.Bedrooms,
-                    )?.[1]
-                  }
-                  type="number"
-                  inputMode="numeric"
-                  min={1}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                />
-                <label
-                  htmlFor={`attributes-${CabinAttribute.Bedrooms}`}
-                  className="ml-3 text-sm text-gray-600"
-                >
-                  {cabinPropertyTitles[CabinAttribute.Bedrooms]}
-                </label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  id={`attributes-${CabinAttribute.Beds}`}
-                  name={`attributes-${CabinAttribute.Beds}`}
-                  defaultValue={
-                    data.input.attributes.find(
-                      ([x]) => x === CabinAttribute.Beds,
-                    )?.[1]
-                  }
-                  type="number"
-                  inputMode="numeric"
-                  min={1}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                />
-                <label
-                  htmlFor={`attributes-${CabinAttribute.Beds}`}
-                  className="ml-3 text-sm text-gray-600"
-                >
-                  {cabinPropertyTitles[CabinAttribute.Beds]}
-                </label>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-
-        {/* Dates */}
-        <div className="pt-10">
-          <fieldset>
-            <legend className="block text-sm font-medium text-gray-900">
-              Datoer
-            </legend>
-            <div className="space-y-3 pt-6">
-              <DaterangeList
-                name="dates"
-                defaultValues={data.input.dates}
-                min={dateToYearMonthDay(new Date())}
-                counts={data.byAvailableDates
-                  .map((x) => ({
-                    [daterangeId(
-                      x.daterange.map(dateToYearMonthDay) as [string, string],
-                    )]: x.cabins.length,
-                  }))
-                  .reduce<Record<string, number>>(
-                    (acc, x) => ({ ...acc, ...x }),
-                    {},
-                  )}
-              />
-            </div>
-          </fieldset>
-        </div>
-      </Form>
-    </aside>
-  );
-};

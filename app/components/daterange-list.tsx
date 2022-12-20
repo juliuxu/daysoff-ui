@@ -78,7 +78,7 @@ export const DaterangeList = ({
         {selectedDates.map((v) => (
           <span
             key={daterangeId(v)}
-            className="m-1 inline-flex items-center rounded-full border border-gray-200 bg-white py-1.5 pl-3 pr-2 text-sm font-medium text-gray-900"
+            className="m-1 inline-flex items-center rounded-full border bg-white py-1.5 pl-3 pr-2 text-sm font-medium text-gray-900"
           >
             <span>{daterangeFormat(v)}</span>
             <span className="text-sm text-gray-600">
@@ -87,12 +87,9 @@ export const DaterangeList = ({
             </span>
             <button
               type="button"
-              className="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-500"
+              className="ml-1 inline-flex h-4 w-4 flex-shrink-0 rounded-full border-gray-300 p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-500"
               onClick={() => remove(v)}
             >
-              <span className="sr-only">
-                Fjern tidsrom {daterangeFormat(v)}
-              </span>
               <svg
                 className="h-2 w-2"
                 stroke="currentColor"
