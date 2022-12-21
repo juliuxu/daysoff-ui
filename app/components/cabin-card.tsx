@@ -1,5 +1,7 @@
 import { config } from "~/config";
 import type { Cabin, DatePeriod, CabinFeature } from "~/domain";
+import { getGoogleMapsDirectionsFrom } from "~/domain";
+import { getGoogleMapsLink } from "~/domain";
 import { cabinFeatures, cabinPropertyValues } from "~/domain";
 import { CabinAttribute, cabinAttributes } from "~/domain";
 import { getPriceForPeriod } from "~/domain";
@@ -59,7 +61,7 @@ const CabinCard = ({ cabin, period }: CabinCardProps) => (
           </>
         )}
       </div>
-      <div className="betw mt-4 flex justify-between">
+      <div className="mt-4 flex items-end justify-between">
         <span className="font-semibold text-teal-600">
           {cabinAttributes[CabinAttribute.Location](cabin)}
         </span>
@@ -72,6 +74,24 @@ const CabinCard = ({ cabin, period }: CabinCardProps) => (
               </div>
             ))}
         </div>
+      </div>
+      <div className="mt-1 flex items-end">
+        {/* <a
+          className="text-xs text-gray-800 hover:underline"
+          target="_blank"
+          href={getGoogleMapsLink(cabin)}
+          rel="noreferrer"
+        >
+          Google Maps ↗
+        </a> */}
+        <a
+          className="text-xs text-gray-800 hover:underline"
+          target="_blank"
+          href={getGoogleMapsDirectionsFrom(cabin, "Oslo")}
+          rel="noreferrer"
+        >
+          Bilrute fra Oslo ↗
+        </a>
       </div>
     </div>
   </div>

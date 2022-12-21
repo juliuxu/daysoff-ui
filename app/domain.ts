@@ -82,6 +82,11 @@ export const getPriceForPeriod = (cabin: Cabin, datePeriod: DatePeriod) => {
   );
 };
 
+export const getGoogleMapsLink = (cabin: Cabin) =>
+  `https://maps.google.com/?q=${cabin.location.lat},${cabin.location.lng}`;
+export const getGoogleMapsDirectionsFrom = (cabin: Cabin, from: string) =>
+  `https://www.google.com/maps/dir/${from}/${cabin.location.lat},${cabin.location.lng}/`;
+
 // Fix Date
 export const fixDatesInline = (cabinsRaw: SerializeFrom<Cabin[]>) => {
   for (const cabin of cabinsRaw) {
