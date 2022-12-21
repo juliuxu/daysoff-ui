@@ -15,13 +15,12 @@ const BASE = "https://daysoff-ui.pages.dev";
 for (const category in Category) {
   console.log("Fetching for ", cabinCategoryTitles[category as Category]);
 
-  for (let i = 0; i < 15; i += 1) {
+  for (let i = 0; i < 6; i += 1) {
     console.log("attempt", i);
     const url = new URL(
       `/rebuild-cache?category=${Category[category as keyof typeof Category]}`,
       BASE,
     );
-    console.log("go ", url);
     const response = await fetch(url);
     if (response.status === 200) {
       console.log("got 200");
@@ -31,9 +30,9 @@ for (const category in Category) {
     }
 
     if (response.status === 503) {
-      await new Promise((r) => setTimeout(r, 8_000));
+      await new Promise((r) => setTimeout(r, 15_000));
     } else {
-      await new Promise((r) => setTimeout(r, 3_000));
+      await new Promise((r) => setTimeout(r, 5_000));
     }
   }
 }

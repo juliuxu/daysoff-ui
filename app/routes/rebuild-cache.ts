@@ -16,7 +16,7 @@ export const loader = async ({ context, request }: LoaderArgs) => {
     ...Object.fromEntries(searchParams),
   });
 
-  const api = new CachedDaysoffApi(context, { maxAge: 60 * 10 });
+  const api = new CachedDaysoffApi(context, { maxAge: 60 * 20 });
 
   // Ensure logged in
   await api.login();
