@@ -3,7 +3,7 @@ enum Category {
   Ocean = "2",
   Abroad = "3",
 }
-const cabinCategoryTitles: Record<Category, React.ReactNode> = {
+const cabinCategoryTitles: Record<Category, string> = {
   [Category.Mountain]: "Fjellet 🗻",
   [Category.Ocean]: "Sjøen 🌊",
   [Category.Abroad]: "Utlandet ☀️",
