@@ -16,28 +16,38 @@ export interface CabinCardProps {
   period?: DatePeriod;
 }
 const CabinCard = ({ cabin, period }: CabinCardProps) => (
-  <a
-    href={`${config.DAYSOFF_BASEURL}${cabin.link}`}
-    target="_blank"
-    rel="noreferrer"
+  <div
     className="block overflow-hidden rounded-lg border bg-white shadow transition-all hover:shadow-xl"
     title={cabin.title}
   >
-    <div className="relative pb-[40%] sm:pb-[60%]">
-      <img
-        className="absolute h-full w-full object-cover"
-        src={`${config.DAYSOFF_BASEURL}${cabin.images[0]}`}
-        alt=""
-      />
-    </div>
+    <a
+      href={`${config.DAYSOFF_BASEURL}${cabin.link}`}
+      target="_blank"
+      rel="noreferrer"
+    >
+      <div className="relative pb-[40%] sm:pb-[60%]">
+        <img
+          className="absolute h-full w-full object-cover"
+          src={`${config.DAYSOFF_BASEURL}${cabin.images[0]}`}
+          alt=""
+        />
+      </div>
+    </a>
     <div className="p-6">
       <div className="text-xs font-semibold uppercase tracking-wide text-gray-600">
         {cabinAttributes[CabinAttribute.Beds](cabin)} senger &bull;{" "}
         {cabinAttributes[CabinAttribute.Bedrooms](cabin)} soverom
       </div>
-      <h2 className="truncate text-lg font-semibold leading-tight">
-        {cabin.title}
-      </h2>
+      <a
+        href={`${config.DAYSOFF_BASEURL}${cabin.link}`}
+        target="_blank"
+        rel="noreferrer"
+        className="hover:underline"
+      >
+        <h2 className="truncate text-lg font-semibold leading-tight">
+          {cabin.title}
+        </h2>
+      </a>
       <div className="mt-1">
         {period && (
           <>
@@ -64,7 +74,7 @@ const CabinCard = ({ cabin, period }: CabinCardProps) => (
         </div>
       </div>
     </div>
-  </a>
+  </div>
 );
 
 interface CabinLongCardListProps {
