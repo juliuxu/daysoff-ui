@@ -4,6 +4,7 @@ import { cabinFeatures, cabinPropertyValues } from "~/domain";
 import { CabinAttribute, cabinAttributes } from "~/domain";
 import { getPriceForPeriod } from "~/domain";
 import { datesBetween } from "~/utils/misc";
+import { SortRow, useCabinsSort } from "./cabin-table";
 
 const currencyFormatter = new Intl.NumberFormat("no-nb", {
   style: "currency",
@@ -55,8 +56,8 @@ const CabinCard = ({ cabin, period }: CabinCardProps) => (
         <div className="flex gap-1 rounded-full bg-gray-100 px-2">
           {Object.keys(cabinFeatures)
             .map((key) => cabinPropertyValues[key as CabinFeature](cabin))
-            .map((x) => (
-              <div className="w-4 " key={x}>
+            .map((x, i) => (
+              <div key={i} className="w-4">
                 {x === "-" ? " " : x}
               </div>
             ))}
@@ -70,9 +71,21 @@ interface CabinLongCardListProps {
   cabins: Cabin[];
   period?: DatePeriod;
 }
-export const CabinCardList = ({ cabins, period }: CabinLongCardListProps) => {
+export const CabinCardList = ({
+  cabins: cabinsRaw,
+  period,
+}: CabinLongCardListProps) => {
+  const [cabins, sortState, toggleSortState] = useCabinsSort(cabinsRaw);
+
   return (
     <div>
+      <SortRow
+        cabins={cabins}
+        sortState={sortState}
+        toggleSortState={toggleSortState}
+      />
+      <div className="mt-6" />
+
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {cabins.map((cabin) => (
           <li key={cabin.link}>

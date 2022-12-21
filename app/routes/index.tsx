@@ -143,7 +143,14 @@ export default function Component() {
             {/* <CabinTable cabins={cabins} /> */}
 
             {/* Card view */}
-            {byAvailableDates.length === 0 && <CabinCardList cabins={cabins} />}
+            {byAvailableDates.length === 0 && (
+              <>
+                <p className="mb-4 text-xl font-semibold uppercase tracking-wide text-gray-600">
+                  {cabins.length} hytter
+                </p>
+                <CabinCardList cabins={cabins} />
+              </>
+            )}
 
             {/* Card view by availability */}
             <div className="flex flex-col gap-12">
@@ -162,7 +169,7 @@ export default function Component() {
                           {daterangeFormat(daterange)}
                         </h2>
                       </summary>
-                      <div className="mt-6" />
+                      <div className="mt-4" />
                       <CabinCardList
                         period={daterange.map((x) => new Date(x)) as DatePeriod}
                         cabins={availableCabins}

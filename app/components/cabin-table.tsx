@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 import { config } from "~/config";
 import type { Cabin } from "~/domain";
 import { cabinPropertyValues } from "~/domain";
@@ -15,7 +15,7 @@ interface CabinsTableProps {
   cabins: Cabin[];
 }
 
-export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
+export const useCabinsSort = (cabinsRaw: Cabin[]) => {
   const cabins = cabinsRaw.slice();
   const [sortState, setSortState] = React.useState<SortState>({
     name: CabinAttribute.Location,
@@ -41,6 +41,51 @@ export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
       return 0;
     });
   }
+  return [cabins, sortState, toggleSortState] as const;
+};
+
+interface SortRowProps {
+  cabins: Cabin[];
+  sortState: SortState;
+  toggleSortState: (name: SortKey) => void;
+}
+export const SortRow = ({
+  cabins,
+  sortState,
+  toggleSortState,
+}: SortRowProps) => {
+  const id = useId();
+  return (
+    <div>
+      <label
+        htmlFor={id}
+        className="text-xs font-semibold uppercase tracking-wide text-gray-600"
+      >
+        Sorter
+      </label>
+      <div
+        id={id}
+        className="flex flex-wrap justify-between gap-x-2 gap-y-3 rounded border p-2 shadow-sm"
+      >
+        {Object.entries(cabinPropertyTitles).map(([key, title]) => (
+          <button
+            key={title}
+            // TODO: Make accessible
+            className={`cursor-pointer ${
+              key === sortState.name && sortState.dir !== "" && "font-semibold"
+            }`}
+            onClick={() => toggleSortState(key as SortKey)}
+          >
+            {title} {key === sortState.name && sortState.dir}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
+  const [cabins, sortState, toggleSortState] = useCabinsSort(cabinsRaw);
 
   return (
     <table>
