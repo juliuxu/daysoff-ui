@@ -226,7 +226,8 @@ export const Filtering = () => {
                   htmlFor={`max-price`}
                   className="block text-sm font-medium text-gray-600"
                 >
-                  Maks pris (når dato periode er valgt)
+                  Maks pris 💵{" "}
+                  <span className="text-xs">(når dato periode er valgt)</span>
                 </label>
                 <input
                   id={`max-price`}

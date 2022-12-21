@@ -1,7 +1,6 @@
 import { config } from "~/config";
 import type { Cabin, DatePeriod, CabinFeature } from "~/domain";
 import { getGoogleMapsDirectionsFrom } from "~/domain";
-import { getGoogleMapsLink } from "~/domain";
 import { cabinFeatures, cabinPropertyValues } from "~/domain";
 import { CabinAttribute, cabinAttributes } from "~/domain";
 import { getPriceForPeriod } from "~/domain";
@@ -90,7 +89,7 @@ const CabinCard = ({ cabin, period }: CabinCardProps) => (
           href={getGoogleMapsDirectionsFrom(cabin, "Oslo")}
           rel="noreferrer"
         >
-          Bilrute fra Oslo ↗
+          Reise fra Oslo ↗
         </a>
       </div>
     </div>
@@ -105,7 +104,10 @@ export const CabinCardList = ({
   cabins: cabinsRaw,
   period,
 }: CabinLongCardListProps) => {
-  const [cabins, sortState, toggleSortState] = useCabinsSort(cabinsRaw);
+  const [cabins, sortState, toggleSortState] = useCabinsSort({
+    cabinsRaw,
+    period,
+  });
 
   return (
     <div>
@@ -113,6 +115,7 @@ export const CabinCardList = ({
         cabins={cabins}
         sortState={sortState}
         toggleSortState={toggleSortState}
+        period={period}
       />
       <div className="mt-6" />
 

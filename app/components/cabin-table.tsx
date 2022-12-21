@@ -1,12 +1,12 @@
 import React, { useId } from "react";
-import { config } from "~/config";
-import type { Cabin } from "~/domain";
-import { cabinPropertyValues } from "~/domain";
+import type { Cabin, DatePeriod } from "~/domain";
+import { getPriceForPeriod } from "~/domain";
 import { CabinAttribute } from "~/domain";
 import { cabinProperties } from "~/domain";
 import { cabinPropertyTitles } from "~/domain";
 
-type SortKey = keyof typeof cabinProperties;
+type CabinPropertyKey = keyof typeof cabinProperties;
+type SortKey = CabinPropertyKey | "max-price";
 interface SortState {
   name: SortKey;
   dir: "🔼" | "🔽" | "";
@@ -15,7 +15,13 @@ interface CabinsTableProps {
   cabins: Cabin[];
 }
 
-export const useCabinsSort = (cabinsRaw: Cabin[]) => {
+export const useCabinsSort = ({
+  cabinsRaw,
+  period,
+}: {
+  cabinsRaw: Cabin[];
+  period?: DatePeriod;
+}) => {
   const cabins = cabinsRaw.slice();
   const [sortState, setSortState] = React.useState<SortState>({
     name: CabinAttribute.Location,
@@ -23,19 +29,25 @@ export const useCabinsSort = (cabinsRaw: Cabin[]) => {
   });
   const toggleSortState = (name: SortKey) =>
     setSortState((current) => {
-      if (name !== current.name) return { name, dir: "🔽" };
-      else if (current.dir === "") return { name, dir: "🔽" };
-      else if (current.dir === "🔼") return { name, dir: "" };
-      else return { name, dir: "🔼" };
+      if (current.dir === "" || name !== current.name)
+        return { name, dir: "🔼" };
+      else if (current.dir === "🔼") return { name, dir: "🔽" };
+      else if (current.dir === "🔽") return { name, dir: "" };
+      return { name, dir: "" }; // Should not happen
     });
 
   if (sortState.dir !== "") {
-    const x = (cabin: Cabin) => cabinProperties[sortState.name](cabin);
+    const x = (cabin: Cabin) => {
+      if (period && sortState.name === "max-price") {
+        return getPriceForPeriod(cabin, period);
+      } else {
+        return cabinProperties[sortState.name as CabinPropertyKey](cabin);
+      }
+    };
     cabins.sort((a, b) => {
       if (x(a) < x(b)) {
         return sortState.dir === "🔼" ? -1 : 1;
-      }
-      if (x(a) > x(b)) {
+      } else if (x(a) > x(b)) {
         return sortState.dir === "🔼" ? 1 : -1;
       }
       return 0;
@@ -48,13 +60,17 @@ interface SortRowProps {
   cabins: Cabin[];
   sortState: SortState;
   toggleSortState: (name: SortKey) => void;
+  period?: DatePeriod;
 }
 export const SortRow = ({
-  cabins,
   sortState,
   toggleSortState,
+  period,
 }: SortRowProps) => {
   const id = useId();
+  const entries = Object.entries(cabinPropertyTitles) as [SortKey, string][];
+  if (period) entries.push(["max-price", "Pris 💵"]);
+
   return (
     <div>
       <label
@@ -67,7 +83,7 @@ export const SortRow = ({
         id={id}
         className="flex flex-wrap justify-between gap-x-2 gap-y-3 rounded border p-2 shadow-sm"
       >
-        {Object.entries(cabinPropertyTitles).map(([key, title]) => (
+        {entries.map(([key, title]) => (
           <button
             key={title}
             // TODO: Make accessible
@@ -85,7 +101,7 @@ export const SortRow = ({
 };
 
 export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
-  const [cabins, sortState, toggleSortState] = useCabinsSort(cabinsRaw);
+  const [cabins, sortState, toggleSortState] = useCabinsSort({ cabinsRaw });
 
   return (
     <table>
@@ -104,7 +120,7 @@ export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
           ))}
         </tr>
       </thead>
-      <tbody>
+      {/* <tbody>
         {cabins.map((cabin) => (
           <tr key={cabin.link}>
             {Object.keys(cabinPropertyTitles).map((key) => {
@@ -129,7 +145,7 @@ export const CabinTable = ({ cabins: cabinsRaw }: CabinsTableProps) => {
             })}
           </tr>
         ))}
-      </tbody>
+      </tbody> */}
     </table>
   );
 };
