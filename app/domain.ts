@@ -64,7 +64,9 @@ const getPriceForDay = (cabin: Cabin, date: Date) => {
   if (specialPricePeriod) return specialPricePeriod.price;
 
   const res =
-    cabin.priceData[date.getFullYear()]?.[date.getMonth()]?.[date.getDay()];
+    cabin.priceData[date.getFullYear()]?.[date.getMonth()]?.[
+      date.getDay() === 0 ? 6 : date.getDay() - 1
+    ];
 
   return res ?? -999999;
 };
