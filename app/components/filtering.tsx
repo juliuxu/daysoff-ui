@@ -220,6 +220,25 @@ export const Filtering = () => {
                     {},
                   )}
               />
+
+              <div className="">
+                <label
+                  htmlFor={`max-price`}
+                  className="block text-sm font-medium text-gray-600"
+                >
+                  Maks pris (når dato periode er valgt)
+                </label>
+                <input
+                  id={`max-price`}
+                  name={`max-price`}
+                  defaultValue={data.input["max-price"]}
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  step={1000}
+                  className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
             </div>
           </fieldset>
         </div>

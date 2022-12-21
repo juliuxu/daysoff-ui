@@ -2,6 +2,7 @@ import { useLoaderData } from "@remix-run/react";
 import { z } from "zod";
 
 import type { Cabin, DatePeriod } from "~/domain";
+import { getPriceForPeriod } from "~/domain";
 import { CabinAttribute, cabinAttributes } from "~/domain";
 import {
   cabinFeatures,
@@ -41,6 +42,7 @@ const formSchema = z.preprocess(
       .array(z.tuple([z.nativeEnum(CabinAttribute), z.string()]))
       .default([]),
     dates: z.array(dateRangeSchema).default([]),
+    "max-price": z.coerce.number().default(Number.POSITIVE_INFINITY),
   }),
 );
 
@@ -89,7 +91,6 @@ export const loader = async ({ context, request }: LoaderArgs) => {
         Number(value),
       ),
   };
-  console.log("filter", input.attributes);
   cabins = cabins.filter((cabin) =>
     input.attributes.every(([attribute, value]) =>
       attributeFilter[attribute](cabin, value),
@@ -99,7 +100,11 @@ export const loader = async ({ context, request }: LoaderArgs) => {
   // Group by date ranges
   const byAvailableDates = input.dates.map((daterange) => ({
     daterange,
-    cabins: cabins.filter((cabin) => isAvailableForPeriod(cabin, daterange)),
+    cabins: cabins
+      .filter((cabin) => isAvailableForPeriod(cabin, daterange))
+      .filter(
+        (cabin) => getPriceForPeriod(cabin, daterange) <= input["max-price"],
+      ),
   }));
   const availableCabins = new Set(
     byAvailableDates.flatMap((x) => x.cabins).map((x) => x.link),
