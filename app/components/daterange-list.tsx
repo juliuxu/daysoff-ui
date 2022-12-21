@@ -1,5 +1,10 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { daterangeId, daterangeFormat, dateToYearMonthDay } from "~/utils/misc";
+import {
+  daterangeId,
+  daterangeFormat,
+  dateToYearMonthDay,
+  addDays,
+} from "~/utils/misc";
 
 type Daterange = [from: string, to: string];
 interface DaterangeListProps {
@@ -135,7 +140,7 @@ export const DaterangeList = ({
             ref={fromRef}
             type="date"
             value={from}
-            max={to}
+            max={to ? dateToYearMonthDay(addDays(new Date(to), -1)) : undefined}
             onChange={(e) => {
               e.stopPropagation();
               setFrom(e.currentTarget.value);
@@ -155,7 +160,9 @@ export const DaterangeList = ({
             ref={toRef}
             type="date"
             value={to}
-            min={from}
+            min={
+              from ? dateToYearMonthDay(addDays(new Date(from), 1)) : undefined
+            }
             onChange={(e) => {
               e.stopPropagation();
               setTo(e.currentTarget.value);
